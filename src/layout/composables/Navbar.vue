@@ -217,7 +217,7 @@ const logout = async () => {
             return;
         }
 
-        const response = await apiClient.post("/logout", {}, {
+        const response = await apiClient.post("/auth/logout", {}, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
                 "Content-Type": "application/json",
