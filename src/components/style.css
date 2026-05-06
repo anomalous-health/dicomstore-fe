@@ -1,0 +1,9 @@
+/* Custom panel header untuk Panel PrimeVue */
+.custom-panel .p-panel-header {
+    background: #73a2f8 !important;
+    color: #fff !important;
+}
+.content-tabel{
+    margin: 20px;
+}
+
