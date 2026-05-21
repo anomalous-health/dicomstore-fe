@@ -7,12 +7,16 @@
             <Toolbar class="mb-2">
                 <template #start>
                     <FileUpload
+                        ref="fileUpload"
                         mode="advanced"
                         accept=".dcm,application/dicom,application/octet-stream"
                         :maxFileSize="5000000000"
                         label="Import"
                         chooseLabel="Import"
-                        class="mr-2 inline-block">
+                        class="mr-2 inline-block"
+
+                        customUpload
+                        @uploader="uploadDicom">
 
                         <!-- Slot untuk menambahkan tulisan/konten kustom di area drag -->
                         <template #empty>
@@ -63,6 +67,13 @@
                         <Button icon="pi pi-eye" rounded outlined class="mr-2"
                             @click="viewDetails(slotProps.data)"
                             severity="info" />
+                    </template>
+                </Column>
+                <Column header="Kirim Dicom" :exportable="false" style="">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-send" rounded outlined class="mr-2"
+                            @click="sendDicom(slotProps.data)"
+                            severity="success" />
                     </template>
                 </Column>
             </DataTable>
@@ -206,6 +217,7 @@ onMounted(() => {
 const data = ref([]);
 const toast = useToast();
 const dt = ref();
+const fileUpload = ref(null);
 const createDialog = ref(false);
 const editDialog = ref(false);
 const deleteDataDialog = ref(false);
@@ -271,6 +283,58 @@ const fetchData = async () => {
     }
 };
 
+const uploadDicom = async (event) => {
+    const file = event.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            return;
+        }
+
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        const response = await apiClient.post('/dicom/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.status === 200 || response.status === 201) {
+
+            console.log('UPLOAD SUCCESS');
+
+            toast.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'File berhasil diupload',
+                life: 3000
+            });
+
+            console.log('FETCHING DATA');
+
+            await fetchData();
+
+            console.log('FETCH DONE');
+
+            if (fileUpload.value) {
+                fileUpload.value.clear();
+            }
+        }
+
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Gagal mengupload file',
+            life: 3000
+        });
+    }
+};
+
 const create = async () => {
     submitted.value = true;
 
@@ -309,6 +373,33 @@ const create = async () => {
             severity: 'error',
             summary: 'Error',
             detail: error.response?.data?.message || 'Gagal menyimpan data',
+            life: 3000
+        });
+    }
+};
+
+const sendDicom = async (data) => {
+    try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            return;
+        }
+
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        const response = await apiClient.post(`/dicom/${data.id}/send`);
+
+        if (response.status === 200) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'File berhasil dikirim', life: 3000 });
+        }
+
+        await fetchData();
+    } catch (error) {
+        console.error('Error sending file:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Gagal mengirim file',
             life: 3000
         });
     }

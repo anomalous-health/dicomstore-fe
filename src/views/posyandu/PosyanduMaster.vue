@@ -85,7 +85,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { useToast } from "primevue/usetoast";
 import apiClient from "../../services/apiService";
-import "./dicom.css";
+import "./posyandu.css";
 
 const toast = useToast();
 const loading = ref(false);

@@ -28,13 +28,13 @@
                                         <i class="pi pi-chevron-down"></i>
                                     </div> -->
                                     <ul class="list-none p-0 m-0 overflow-hidden">
-                                        <li>
+                                        <!-- <li>
                                             <a v-ripple href="/home"
                                                :class="[{ 'active': isActive('/home') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
                                                 <i class="pi pi-home mr-2"></i>
                                                 <span v-if="open" class="font-medium">Dashboard</span>
                                             </a>
-                                        </li>
+                                        </li> -->
                                        
                                         <li>
                                             <a v-ripple v-styleclass="{
@@ -51,12 +51,64 @@
                                             </a>
                                             <ul
                                                 class="list-none py-0 pl-3 pr-0 m-0 overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                                <li>
+                                                <!-- <li>
                                                     <a v-ripple href="/posyandu/dashboard" :class="[{ 'active': isActive('/posyandu/dashboard') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
                                                         <i class="pi pi-chart-bar mr-2"></i>
                                                         <span v-if="open" class="font-medium">Dashboard</span>
                                                     </a>
-                                                </li>
+                                                </li> -->
+
+                                                <li>
+                                                <a v-ripple
+                                                    href="/log/log-upload"
+                                                    :class="[{ 'active': isActive('/logdicom/upload-log') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                    <i class="pi pi-users mr-2"></i>
+                                                    <span v-if="open" class="font-medium">Log Upload Dicom</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a v-ripple
+                                                    href="/log/monitoring"
+                                                    :class="[{ 'active': isActive('/log/monitoring') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                    <i class="pi pi-desktop mr-2"></i>
+                                                    <span v-if="open" class="font-medium">Monitoring Router</span>
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a v-ripple v-styleclass="{
+                                                    selector: '@next',
+                                                    enterClass: 'hidden',
+                                                    enterActiveClass: 'slidedown',
+                                                    leaveToClass: 'hidden',
+                                                    leaveActiveClass: 'slideup'
+                                                }"
+                                                    :class="['flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple', { 'active': isActive('/master') }]">
+                                                    <i class="pi pi-database mr-2"></i>
+                                                    <span v-if="open" class="font-medium">Master Data</span>
+                                                    <i class="pi pi-chevron-down ml-auto"></i>
+                                                </a>
+                                                <ul
+                                                    class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+
+
+
+                                                    <!-- <li>
+                                                    <a v-ripple href="/posyandu/master" :class="[{ 'active': isActive('/posyandu/master') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                        <i class="pi pi-building mr-2"></i>
+                                                        <span v-if="open" class="font-medium">Data</span>
+                                                    </a>
+                                                </li> -->
+
+                                                    <li>
+                                                        <a v-ripple href="/auth/users"
+                                                            :class="[{ 'active': isActive('/auth/users') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                            <i class="pi pi-user-edit mr-2"></i>
+                                                            <span v-if="open" class="font-medium">Pengguna</span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </li>
                                            
                                                
                                                 <!-- <li>
@@ -76,57 +128,15 @@
                                         </li>
                                     
                                        
-                                        <li>
+                                        <!-- <li>
                                             <a v-ripple
                                                href="/master/pasien"
                                                :class="[{ 'active': isActive('/master/pasien') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
                                                 <i class="pi pi-users mr-2"></i>
                                                 <span v-if="open" class="font-medium">Menu</span>
                                             </a>
-                                        </li>
-                                        <li>
-                                            <a v-ripple
-                                               href="/log/log-upload"
-                                               :class="[{ 'active': isActive('/logdicom/upload-log') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                <i class="pi pi-users mr-2"></i>
-                                                <span v-if="open" class="font-medium">Log Upload Dicom</span>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a v-ripple v-styleclass="{
-                                                selector: '@next',
-                                                enterClass: 'hidden',
-                                                enterActiveClass: 'slidedown',
-                                                leaveToClass: 'hidden',
-                                                leaveActiveClass: 'slideup'
-                                            }"
-                                                :class="['flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple', { 'active': isActive('/master') }]">
-                                                <i class="pi pi-database mr-2"></i>
-                                                <span v-if="open" class="font-medium">Master Data</span>
-                                                <i class="pi pi-chevron-down ml-auto"></i>
-                                            </a>
-                                            <ul
-                                                class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-
-                                              
-                                               
-                                                 <li>
-                                                    <a v-ripple href="/posyandu/master" :class="[{ 'active': isActive('/posyandu/master') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                        <i class="pi pi-building mr-2"></i>
-                                                        <span v-if="open" class="font-medium">Data</span>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a v-ripple href="/auth/users"
-                                                    :class="[{ 'active': isActive('/auth/users') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                        <i class="pi pi-user-edit mr-2"></i>
-                                                        <span v-if="open" class="font-medium">Pengguna</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </li>
+                                        </li> -->
+                                      
                                     </ul>
                                 </li>
                             </ul>

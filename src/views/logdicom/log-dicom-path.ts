@@ -5,6 +5,7 @@ import detailPasien from "../../components/master/detail-pasien.vue";
 import tambahDiagnosa from "../../components/master/tambah-diagnosa.vue";
 import tambahObat from "../../components/master/tambah-obat.vue";
 import uploadLog from "../../components/logdicom/upload-log.vue";
+import MonitoringView from "../../components/logdicom/MonitoringView.vue";
 
 const masterPath: Array<RouteRecordRaw> = [
   {
@@ -17,6 +18,11 @@ const masterPath: Array<RouteRecordRaw> = [
         path: "log-upload",
         name: "Log Upload",
         component: uploadLog
+      },
+      {
+        path: "monitoring",
+        name: "Monitoring PM2",
+        component: MonitoringView
       },
       {
         path: "pasien/:id",
