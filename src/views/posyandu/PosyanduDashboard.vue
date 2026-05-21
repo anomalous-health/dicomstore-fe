@@ -38,7 +38,7 @@
             <Tag severity="success" :value="dashboard?.periode?.tanggal_selesai || '-'" />
           </div>
           <Divider />
-          <p class="m-0 text-color-secondary">Data diambil dari jadwal, kunjungan, imunisasi, pengukuran balita, dan pemeriksaan ibu hamil.</p>
+          <p class="m-0 text-color-secondary">Data diambil dari proses keseluruhan.</p>
         </div>
       </div>
     </div>

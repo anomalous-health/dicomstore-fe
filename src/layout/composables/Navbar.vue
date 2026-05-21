@@ -5,7 +5,7 @@
             <template #start>
                 <div class="flex align-items-center justify-content-between pt-3 flex-shrink-0">
                     <span class="inline-flex align-items-center gap-2" style="margin-bottom: 10px;">
-                        <img src="../../assets/spongebob.png" width="50" height="40" alt="Logo" />
+                        <img src="../../assets/jmt.png" width="40" height="40" alt="Logo" />
                     </span>
                 </div>
             </template>
@@ -16,6 +16,10 @@
                         <select v-model="selectedTheme" @change="onThemeChange">
                             <option v-for="t in themes" :key="t" :value="t">{{ t }}</option>
                         </select>
+                        <!-- <div class="card flex justify-content-center">
+                            <Dropdown v-model="selectedTheme" :options="themes" optionLabel="name" placeholder="Pilih Tema" class="w-full md:w-14rem" />
+                        </div> -->
+                        
                     </div>
 
                     <div class="toggle-container" @click="toggleDarkMode">
@@ -240,6 +244,13 @@ const menuSetting = [
         icon: "pi pi-cog",
         command: () => {
             window.location.href = "/setting";
+        },
+    },
+    {
+        label: "Change Password",
+        icon: "pi pi-key",
+        command: () => {
+            router.push({ name: "ChangePassword" });
         },
     },
     {

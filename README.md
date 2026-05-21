@@ -1,4 +1,4 @@
-# Invoice
+# DicomStore
 
 cara install dan menjalankannya
 

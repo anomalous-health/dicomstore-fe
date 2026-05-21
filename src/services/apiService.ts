@@ -11,7 +11,7 @@ import router from "../router";
 apiClient.interceptors.request.use(
   (config) => {
     //menambah token ke header request jika ada
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

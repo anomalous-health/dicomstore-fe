@@ -4,6 +4,7 @@ import { requireAuth } from "../utils/requireAuth";
 import authLayout from "../layout/auth.vue";
 import defaultLayout from "../layout/default.vue";
 import dashboard from "../views/dashboard.vue";
+import logDicomPath from "../views/logdicom/log-dicom-path";
 
 const routes = [
   {
@@ -51,6 +52,11 @@ const routes = [
         name: "AuthUsers",
         component: () => import("../views/auth/AuthUsers.vue"),
       },
+      {
+        path: "/auth/change-password",
+        name: "ChangePassword",
+        component: () => import("../views/auth/ChangePassword.vue"),
+      },
     ],
     beforeEnter: requireAuth,
   },
@@ -71,6 +77,7 @@ const routes = [
   },
 
   ...masterPath,
+  ...logDicomPath,
 ];
 
 const router = createRouter({
