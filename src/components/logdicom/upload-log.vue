@@ -6,6 +6,8 @@
             <!-- Button -->
             <Toolbar class="mb-2">
                 <template #start>
+                   
+
                     <FileUpload
                         ref="fileUpload"
                         mode="advanced"
@@ -22,13 +24,20 @@
                         <template #empty>
                             <div class="flex items-center justify-center flex-col py-4" style="text-align: center;">
                                 <i class="pi pi-cloud-upload text-gray-400" style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
-                                <p class="m-0 text-gray-500 font-semibold">Drag here</p>
-                                <span class="text-xs text-gray-400">(atau klik tombol Import untuk memilih file)</span>
+                                <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
+                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file)</span>
                             </div>
+                          
                         </template>
 
                     </FileUpload>
+                    
                     <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
+                </template>
+                <template #end>
+                <div class="card" style="float right; width: 1100px; height: 300px; margin-top: -10px;">
+                    <MiniMonitoringView />
+                </div>
                 </template>
                 <!-- <template #end>
                     <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
@@ -61,23 +70,74 @@
                 <Column field="patientId" header="No RM" sortable style=""></Column>
                 <Column field="studyInstanceUid" header="Study Instance UID" sortable style=""></Column>
                 <Column field="message" header="Keterangan" sortable style=""></Column>
-                <Column field="status" header="Status" sortable style=""></Column>
-                <Column header="Lihat Detail Pasien" :exportable="false" style="">
+                <Column header="Status Upload" sortable style="" field="status">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" rounded outlined class="mr-2"
-                            @click="viewDetails(slotProps.data)"
-                            severity="info" />
+                        <Tag :severity="getUploadStatusSeverity(slotProps.data.status)" :value="getUploadStatusLabel(slotProps.data.status)" />
                     </template>
                 </Column>
-                <Column header="Kirim Dicom" :exportable="false" style="">
+                <Column header="Status Kirim" sortable style="" field="routerStatus">
                     <template #body="slotProps">
-                        <Button icon="pi pi-send" rounded outlined class="mr-2"
+                        <Tag :severity="getSendStatusSeverity(slotProps.data)" :value="getSendStatusLabel(slotProps.data)" />
+                    </template>
+                </Column>
+                <Column header="Aksi" :exportable="false" style="min-width: 14rem">
+                    <template #body="slotProps">
+                        <!-- Lihat Detail -->
+                        <!-- <Button icon="pi pi-eye" rounded outlined class="mr-2"
+                            v-tooltip.top="'Lihat Detail'"
+                            @click="viewDetails(slotProps.data)"
+                            severity="info" /> -->
+
+                        <!-- Cek Service Request di SatuSehat -->
+                        <Button
+                            v-if="slotProps.data.accessionNumber"
+                            icon="pi pi-search"
+                            rounded outlined class="mr-2"
+                            v-tooltip.top="'Cek Service Request'"
+                            @click="checkServiceRequest(slotProps.data)"
+                            severity="help"
+                            :loading="slotProps.data._checkingSR" />
+
+                        <!-- Tombol kirim pertama kali (belum dikirim / uploaded) -->
+                        <Button
+                            v-if="slotProps.data.status === 'UPLOADED'"
+                            icon="pi pi-send"
+                            rounded outlined class="mr-2"
+                            v-tooltip.top="'Kirim ke Router'"
                             @click="sendDicom(slotProps.data)"
                             severity="success" />
+
+                        <!-- Tombol retry: muncul saat gagal ke router ATAU gagal ke SatuSehat -->
+                        <Button
+                            v-if="isRetryable(slotProps.data)"
+                            icon="pi pi-replay"
+                            rounded outlined class="mr-2"
+                            v-tooltip.top="'Kirim Ulang'"
+                            @click="retryDicom(slotProps.data)"
+                            severity="warning"
+                            :loading="slotProps.data._retrying" />
+
+                        <!-- Indikator loading saat sedang mengirim -->
+                        <Button
+                            v-if="slotProps.data.status === 'SENDING'"
+                            icon="pi pi-spin pi-spinner"
+                            rounded outlined class="mr-2"
+                            severity="info"
+                            disabled />
+
+                        <!-- Sukses: tombol kirim di-disabled -->
+                        <Button
+                            v-if="slotProps.data.status === 'SENT' && slotProps.data.routerStatus === 'SUCCESS'"
+                            icon="pi pi-check"
+                            rounded outlined class="mr-2"
+                            severity="success"
+                            disabled />
                     </template>
                 </Column>
             </DataTable>
         </div>
+
+       
 
         <!-- Create Dialog -->
         <Dialog v-model:visible="createDialog" :style="{ width: '450px' }" header="Tambah Pasien" :modal="true" class="p-fluid">
@@ -196,6 +256,43 @@
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedData" />
             </template>
         </Dialog>
+
+        <!-- Service Request Check Dialog -->
+        <Dialog v-model:visible="srDialog" :style="{ width: '520px' }" header="Cek Service Request SatuSehat" :modal="true">
+            <div v-if="srLoading" class="flex justify-content-center py-4">
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div v-else-if="srResult">
+                <div class="flex align-items-center gap-2 mb-3">
+                    <i :class="srResult.found ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+                       :style="{ fontSize: '1.5rem', color: srResult.found ? '#16a34a' : '#dc2626' }"></i>
+                    <strong>{{ srResult.message }}</strong>
+                </div>
+
+                <div v-if="srResult.found" class="surface-ground border-round p-3">
+                    <div class="grid">
+                        <div class="col-5 font-semibold">Accession Number</div>
+                        <div class="col-7">{{ srResult.accessionNumber }}</div>
+                        <div class="col-5 font-semibold">ServiceRequest ID</div>
+                        <div class="col-7" style="word-break: break-all;">{{ srResult.serviceRequestId }}</div>
+                        <div class="col-5 font-semibold">Patient ID (FHIR)</div>
+                        <div class="col-7" style="word-break: break-all;">{{ srResult.patientId || '-' }}</div>
+                        <div class="col-5 font-semibold">Status</div>
+                        <div class="col-7">
+                            <Tag :severity="srResult.status === 'active' ? 'success' : 'info'" :value="srResult.status || '-'" />
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="srResult.error" class="mt-2">
+                    <Tag severity="danger" value="Error" />
+                    <small class="ml-2 text-red-500">{{ srResult.message }}</small>
+                </div>
+            </div>
+            <template #footer>
+                <Button label="Tutup" icon="pi pi-times" text @click="srDialog = false" />
+            </template>
+        </Dialog>
     </div>
 </template>
 
@@ -209,10 +306,92 @@ import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import apiClient from '../../services/apiService';
 import { useRouter } from 'vue-router';
+import MiniMonitoringView from './MiniMonitoringView.vue';
+
+const getUploadStatusSeverity = (status) => {
+    return status === 'INVALID' ? 'danger' : 'success';
+};
+
+const getUploadStatusLabel = (status) => {
+    return status === 'INVALID' ? 'Invalid' : 'Sukses';
+};
+
+const getSendStatusSeverity = (rowData) => {
+    const status = rowData.status;
+    const routerStatus = rowData.routerStatus;
+
+    if (status === 'INVALID') return 'danger';
+    if (status === 'UPLOADED') return 'secondary';
+    if (status === 'SENDING') return 'info';
+    if (status === 'FAILED') return 'danger';
+    
+    // status is SENT
+    if (routerStatus === 'SUCCESS') return 'success';
+    if (routerStatus === 'FAILED') return 'danger';
+    if (routerStatus === 'SENDING') return 'warning';
+    
+    return 'info'; // SENT to router but not yet processed
+};
+
+const getSendStatusLabel = (rowData) => {
+    const status = rowData.status;
+    const routerStatus = rowData.routerStatus;
+
+    if (status === 'INVALID') return 'Invalid';
+    if (status === 'UPLOADED') return 'Belum Dikirim';
+    if (status === 'SENDING') return 'Mengirim ke Router';
+    if (status === 'FAILED') return 'Gagal ke Router';
+    
+    // status is SENT
+    if (routerStatus === 'SUCCESS') return 'Terkirim ke SatuSehat';
+    if (routerStatus === 'FAILED') return 'Gagal ke SatuSehat';
+    if (routerStatus === 'SENDING') return 'Router Memproses';
+    
+    return 'Terkirim ke Router';
+};
 
 onMounted(() => {
     fetchData();
 });
+
+const checkServiceRequest = async (rowData) => {
+    if (!rowData.accessionNumber) {
+        toast.add({ severity: 'warn', summary: 'Peringatan', detail: 'Accession Number tidak tersedia', life: 3000 });
+        return;
+    }
+
+    srResult.value = null;
+    srLoading.value = true;
+    srDialog.value = true;
+    rowData._checkingSR = true;
+
+    try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            srDialog.value = false;
+            return;
+        }
+
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        const response = await apiClient.get('/satusehat/service-request', {
+            params: { accessionNumber: rowData.accessionNumber }
+        });
+
+        srResult.value = response.data;
+    } catch (error) {
+        console.error('Error checking ServiceRequest:', error);
+        srResult.value = {
+            found: false,
+            error: true,
+            accessionNumber: rowData.accessionNumber,
+            message: error.response?.data?.message || 'Gagal mengecek ServiceRequest ke SatuSehat'
+        };
+    } finally {
+        srLoading.value = false;
+        rowData._checkingSR = false;
+    }
+};
 
 const data = ref([]);
 const toast = useToast();
@@ -221,6 +400,9 @@ const fileUpload = ref(null);
 const createDialog = ref(false);
 const editDialog = ref(false);
 const deleteDataDialog = ref(false);
+const srDialog = ref(false);
+const srResult = ref(null);
+const srLoading = ref(false);
 const pasien = ref({});
 const selectedPasiens = ref();
 const submitted = ref(false);
@@ -378,7 +560,7 @@ const create = async () => {
     }
 };
 
-const sendDicom = async (data) => {
+const sendDicom = async (rowData) => {
     try {
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) {
@@ -387,10 +569,10 @@ const sendDicom = async (data) => {
         }
 
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        const response = await apiClient.post(`/dicom/${data.id}/send`);
+        const response = await apiClient.post(`/dicom/${rowData.id}/send`);
 
-        if (response.status === 200) {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'File berhasil dikirim', life: 3000 });
+        if (response.status === 200 || response.status === 201) {
+            toast.add({ severity: 'success', summary: 'Berhasil', detail: 'File berhasil dikirim ke router dan sedang diproses', life: 3000 });
         }
 
         await fetchData();
@@ -402,6 +584,46 @@ const sendDicom = async (data) => {
             detail: error.response?.data?.message || 'Gagal mengirim file',
             life: 3000
         });
+    }
+};
+
+/**
+ * Kondisi retry: gagal kirim ke router (status FAILED)
+ * atau sudah sampai router tapi gagal diteruskan ke SatuSehat (routerStatus FAILED)
+ */
+const isRetryable = (rowData) => {
+    return rowData.status === 'FAILED' ||
+        (rowData.status === 'SENT' && rowData.routerStatus === 'FAILED');
+};
+
+const retryDicom = async (rowData) => {
+    try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            return;
+        }
+
+        // Tandai baris sedang retry (loading indicator)
+        rowData._retrying = true;
+
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        const response = await apiClient.post(`/dicom/${rowData.id}/retry`);
+
+        if (response.status === 200 || response.status === 201) {
+            toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Pengiriman ulang berhasil dimulai', life: 3000 });
+        }
+
+        await fetchData();
+    } catch (error) {
+        console.error('Error retrying DICOM:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Gagal Kirim Ulang',
+            detail: error.response?.data?.message || 'Gagal melakukan kirim ulang DICOM',
+            life: 3000
+        });
+        rowData._retrying = false;
     }
 };
 
