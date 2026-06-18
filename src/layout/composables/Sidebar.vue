@@ -107,6 +107,13 @@
                                                             <span v-if="open" class="font-medium">Pengguna</span>
                                                         </a>
                                                     </li>
+                                                    <li>
+                                                        <a v-ripple href="/satusehat/config"
+                                                            :class="[{ 'active': isActive('/satusehat/config') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                            <i class="pi pi-cog mr-2"></i>
+                                                            <span v-if="open" class="font-medium">SATUSEHAT Config</span>
+                                                        </a>
+                                                    </li>
                                                 </ul>
                                             </li>
                                            

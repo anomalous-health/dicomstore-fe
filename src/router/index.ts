@@ -57,6 +57,11 @@ const routes = [
         name: "ChangePassword",
         component: () => import("../views/auth/ChangePassword.vue"),
       },
+      {
+        path: "/satusehat/config",
+        name: "SatuSehatConfig",
+        component: () => import("../views/satusehat/SatuSehatConfig.vue"),
+      },
     ],
     beforeEnter: requireAuth,
   },
