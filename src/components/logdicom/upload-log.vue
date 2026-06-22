@@ -580,10 +580,11 @@ const sendDicom = async (rowData) => {
         console.error('Error sending file:', error);
         toast.add({
             severity: 'error',
-            summary: 'Error',
-            detail: error.response?.data?.message || 'Gagal mengirim file',
-            life: 3000
+            summary: 'Gagal Mengirim DICOM',
+            detail: responseMessage(error, 'Gagal mengirim file'),
+            life: 6000
         });
+        await fetchData();
     }
 };
 
@@ -620,12 +621,21 @@ const retryDicom = async (rowData) => {
         toast.add({
             severity: 'error',
             summary: 'Gagal Kirim Ulang',
-            detail: error.response?.data?.message || 'Gagal melakukan kirim ulang DICOM',
-            life: 3000
+            detail: responseMessage(error, 'Gagal melakukan kirim ulang DICOM'),
+            life: 6000
         });
+        await fetchData();
         rowData._retrying = false;
     }
 };
+
+function responseMessage(error, fallback) {
+    const data = error.response?.data;
+    if (typeof data === 'string' && data.trim()) {
+        return data;
+    }
+    return data?.message || data?.pesan || error.message || fallback;
+}
 
 const update = async () => {
     submitted.value = true;
