@@ -11,6 +11,7 @@
                     <FileUpload
                         ref="fileUpload"
                         mode="advanced"
+                        :multiple="true"
                         accept=".dcm,application/dicom,application/octet-stream"
                         :maxFileSize="5000000000"
                         label="Import"
@@ -25,13 +26,14 @@
                             <div class="flex items-center justify-center flex-col py-4" style="text-align: center;">
                                 <i class="pi pi-cloud-upload text-gray-400" style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
                                 <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
-                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file)</span>
+                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file, bisa pilih banyak file sekaligus)</span>
                             </div>
                           
                         </template>
 
                     </FileUpload>
                     
+                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class="mr-2" @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
                     <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
                 </template>
                 <template #end>
@@ -293,6 +295,23 @@
                 <Button label="Tutup" icon="pi pi-times" text @click="srDialog = false" />
             </template>
         </Dialog>
+
+        <!-- Upload Progress Dialog -->
+        <Dialog v-model:visible="uploadProgressDialog" :style="{ width: '600px' }" header="Proses Upload" :modal="true" :closable="false">
+            <div class="mb-3">
+                <ProgressBar :value="uploadProgressValue"></ProgressBar>
+                <div class="text-center mt-2">{{ uploadProgressText }}</div>
+            </div>
+            <div class="max-h-20rem overflow-y-auto">
+                <div v-for="(file, index) in uploadStatuses" :key="index" class="flex justify-content-between align-items-center p-2 border-bottom-1 surface-border">
+                    <span class="text-overflow-ellipsis overflow-hidden white-space-nowrap" style="max-width: 70%;" :title="file.name">{{ file.name }}</span>
+                    <Tag :severity="file.status === 'SUCCESS' ? 'success' : (file.status === 'FAILED' ? 'danger' : (file.status === 'DUPLICATE' ? 'warning' : 'info'))" :value="file.status"></Tag>
+                </div>
+            </div>
+            <template #footer>
+                <Button label="Tutup" icon="pi pi-times" text @click="closeUploadProgressDialog" :disabled="isUploading" />
+            </template>
+        </Dialog>
     </div>
 </template>
 
@@ -408,6 +427,17 @@ const selectedPasiens = ref();
 const submitted = ref(false);
 const router = useRouter();
 
+const uploadProgressDialog = ref(false);
+const isUploading = ref(false);
+const uploadProgressValue = ref(0);
+const uploadProgressText = ref('');
+const uploadStatuses = ref([]);
+
+const closeUploadProgressDialog = () => {
+    uploadProgressDialog.value = false;
+    uploadStatuses.value = [];
+};
+
 const jenisKelaminOptions = [
     { label: 'Laki-laki', value: 'L' },
     { label: 'Perempuan', value: 'P' }
@@ -466,40 +496,70 @@ const fetchData = async () => {
 };
 
 const uploadDicom = async (event) => {
-    const file = event.files[0];
+    const files = event.files;
+    if (!files || files.length === 0) return;
+
     const formData = new FormData();
-    formData.append('file', file);
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+
+    uploadProgressDialog.value = true;
+    isUploading.value = true;
+    uploadProgressValue.value = 0;
+    uploadProgressText.value = `Mengupload 0 dari ${files.length} file...`;
+    
+    uploadStatuses.value = Array.from(files).map(f => ({ name: f.name, status: 'UPLOADING' }));
 
     try {
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) {
             toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            isUploading.value = false;
             return;
         }
 
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        const response = await apiClient.post('/dicom/upload', formData, {
+        const response = await apiClient.post('/dicom/upload/batch', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
+            },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                uploadProgressValue.value = percentCompleted;
+                if (percentCompleted === 100) {
+                    uploadProgressText.value = 'Memproses file di server...';
+                } else {
+                    uploadProgressText.value = `Mengupload: ${percentCompleted}%`;
+                }
             }
         });
 
         if (response.status === 200 || response.status === 201) {
-
-            console.log('UPLOAD SUCCESS');
+            const resData = response.data;
+            uploadProgressText.value = `Selesai: ${resData.sukses} sukses, ${resData.duplikat} duplikat, ${resData.gagal} gagal.`;
+            
+            if (resData.hasil && resData.hasil.length === files.length) {
+                resData.hasil.forEach((h, i) => {
+                    if (h.status === 'INVALID' || h.message.startsWith('Gagal')) {
+                        uploadStatuses.value[i].status = 'FAILED';
+                    } else if (h.message && h.message.startsWith('Duplikat')) {
+                        uploadStatuses.value[i].status = 'DUPLICATE';
+                        uploadStatuses.value[i].name += ' (Duplikat)';
+                    } else {
+                        uploadStatuses.value[i].status = 'SUCCESS';
+                    }
+                });
+            }
 
             toast.add({
                 severity: 'success',
-                summary: 'Successful',
-                detail: 'File berhasil diupload',
-                life: 3000
+                summary: 'Upload Selesai',
+                detail: `${resData.sukses} sukses, ${resData.duplikat} duplikat, ${resData.gagal} gagal.`,
+                life: 5000
             });
 
-            console.log('FETCHING DATA');
-
             await fetchData();
-
-            console.log('FETCH DONE');
 
             if (fileUpload.value) {
                 fileUpload.value.clear();
@@ -508,12 +568,60 @@ const uploadDicom = async (event) => {
 
     } catch (error) {
         console.error('Error uploading file:', error);
+        uploadProgressText.value = 'Upload gagal';
         toast.add({
             severity: 'error',
             summary: 'Error',
             detail: error.response?.data?.message || 'Gagal mengupload file',
             life: 3000
         });
+    } finally {
+        isUploading.value = false;
+        uploadProgressValue.value = 100;
+    }
+};
+
+const sendSelectedDicom = async () => {
+    if (!selectedPasiens.value || !selectedPasiens.value.length) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Pilih file DICOM terlebih dahulu', life: 3000 });
+        return;
+    }
+
+    const ids = selectedPasiens.value.map(item => item.id);
+
+    try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            return;
+        }
+
+        toast.add({ severity: 'info', summary: 'Info', detail: `Mengirim ${ids.length} file ke router...`, life: 3000 });
+
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        const response = await apiClient.post('/dicom/send/batch', ids);
+
+        if (response.status === 200 || response.status === 201) {
+            const resData = response.data;
+            toast.add({ 
+                severity: 'success', 
+                summary: 'Kirim Selesai', 
+                detail: `${resData.sukses} sukses dikirim ke router, ${resData.gagal} gagal.`, 
+                life: 5000 
+            });
+        }
+
+        selectedPasiens.value = [];
+        await fetchData();
+    } catch (error) {
+        console.error('Error sending selected DICOMs:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Gagal mengirim file terpilih',
+            life: 3000
+        });
+        await fetchData();
     }
 };
 
@@ -611,18 +719,45 @@ const retryDicom = async (rowData) => {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         const response = await apiClient.post(`/dicom/${rowData.id}/retry`);
 
-        if (response.status === 200 || response.status === 201) {
+        // Response contains the upload object (may be returned with 200 or error status)
+        const uploadResult = response.data;
+
+        if (uploadResult) {
+            // Jika routerStatus FAILED atau status FAILED, tampilkan detail payload
+            if (uploadResult.routerStatus === 'FAILED' || uploadResult.status === 'FAILED') {
+                // Tampilkan singkat: hanya routerStatus
+                const detailText = `routerStatus: ${uploadResult.routerStatus || uploadResult.status}`;
+                toast.add({ severity: 'error', summary: 'Gagal Kirim Ulang Cek log.', detail: detailText, life: 8000 });
+            } else {
+                toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Pengiriman ulang berhasil dimulai', life: 3000 });
+            }
+        } else {
             toast.add({ severity: 'success', summary: 'Berhasil', detail: 'Pengiriman ulang berhasil dimulai', life: 3000 });
         }
 
         await fetchData();
     } catch (error) {
         console.error('Error retrying DICOM:', error);
+        // Jika backend mengembalikan body (mis. upload object) pada error (502), tampilkan juga payloadnya
+        const respData = error.response?.data;
+        let detailMsg = responseMessage(error, 'Gagal melakukan kirim ulang DICOM');
+        if (respData) {
+            try {
+                if (typeof respData === 'object' && respData.routerStatus) {
+                    detailMsg = `routerStatus: ${respData.routerStatus}`;
+                } else {
+                    detailMsg = typeof respData === 'string' ? respData : (respData.message || respData.pesan || JSON.stringify(respData));
+                }
+            } catch (e) {
+                detailMsg = JSON.stringify(respData);
+            }
+        }
+
         toast.add({
             severity: 'error',
             summary: 'Gagal Kirim Ulang',
-            detail: responseMessage(error, 'Gagal melakukan kirim ulang DICOM'),
-            life: 6000
+            detail: detailMsg,
+            life: 8000
         });
         await fetchData();
         rowData._retrying = false;
@@ -634,7 +769,11 @@ function responseMessage(error, fallback) {
     if (typeof data === 'string' && data.trim()) {
         return data;
     }
-    return data?.message || data?.pesan || error.message || fallback;
+    // Jika data adalah objek, coba tampilkan message/pesan atau seluruh objek sebagai JSON
+    if (data && typeof data === 'object') {
+        return data.message || data.pesan || JSON.stringify(data);
+    }
+    return error.message || fallback;
 }
 
 const update = async () => {
