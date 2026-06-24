@@ -1,14 +1,16 @@
 <template>
-    <div class="content-tabel">
+    <div class="monitor-page">
         <div class="card">
             <Toast />
 
             <!-- Button -->
             <Toolbar class="mb-2">
                 <template #start>
+                    
                    
 
                     <FileUpload
+                    
                         ref="fileUpload"
                         mode="advanced"
                         :multiple="true"
@@ -28,12 +30,14 @@
                                 <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
                                 <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file, bisa pilih banyak file sekaligus)</span>
                             </div>
+                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class="ml-2" @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
+
                           
                         </template>
+                        
 
                     </FileUpload>
                     
-                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class="mr-2" @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
                     <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
                 </template>
                 <template #end>
@@ -64,7 +68,9 @@
                             <InputText v-model="filters['global'].value" placeholder="Search..." />
                         </IconField>
                     </div>
+
                 </template>
+                
 
                 <Column selectionMode="multiple" style="" :exportable="false"></Column>
                 <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
@@ -317,6 +323,13 @@
 
 <style>
 @import '../style.css';
+
+.monitor-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
 </style>
 
 <script setup>

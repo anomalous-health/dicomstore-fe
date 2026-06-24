@@ -60,8 +60,8 @@
 
                                                 <li>
                                                 <a v-ripple
-                                                    href="/log/log-upload"
-                                                    :class="[{ 'active': isActive('/logdicom/upload-log') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
+                                                    href="/log/upload"
+                                                    :class="[{ 'active': isActive('/logdicom/upload-') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
                                                     <i class="pi pi-users mr-2"></i>
                                                     <span v-if="open" class="font-medium">Log Upload Dicom</span>
                                                 </a>
