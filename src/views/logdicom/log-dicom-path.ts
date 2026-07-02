@@ -16,7 +16,7 @@ const masterPath: Array<RouteRecordRaw> = [
     
     
       {
-        path: "log-upload",
+        path: "upload",
         name: "Log Upload",
         component: uploadLog
       },

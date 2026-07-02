@@ -1,5 +1,5 @@
 <template>
-    <div class="content-tabel">
+    <div class="monitor-page">
         <div class="card">
             <Toast />
 
@@ -66,6 +66,7 @@
                             </div>
 
                         </template>
+                        
 
                     </FileUpload>
 
@@ -97,6 +98,7 @@
                         @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
 
                 </template>
+                
 
                 <Column selectionMode="multiple" style="" :exportable="false"></Column>
                 <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
@@ -347,6 +349,13 @@
 
 <style>
 @import '../style.css';
+
+.monitor-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
 </style>
 
 <script setup>
