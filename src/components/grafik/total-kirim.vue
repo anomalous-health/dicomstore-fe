@@ -3,18 +3,27 @@
     <div class="card">
       <Toast />
       
-      <h1 class="mb-4">Selamat Datang di Dashboard {{ userRole }}</h1>
 
       <div class="grid">
-        <div class="col-12">
-          <Panel header="" class="mb-3">
-           <totalKirim/>
-          </Panel>
+        <div class="col-6">
+          <Panel>
+            <template #header>
+            <div class="txtcenter" style="">
+              <h3>DATA YANG BERHASIL TERKIRIM KE SATUSEHAT</h3>
+            </div>
+            </template>
+            <h2 class="mb-4">{{ totalKirim }}</h2>
+            
+        </Panel>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<!-- <style scoped>
+@import './grafik.css';
+</style> -->
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -23,8 +32,9 @@ import { useToast } from 'primevue/usetoast';
 import { FilterMatchMode } from 'primevue/api';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import apiClient from '../services/apiService';
-import totalKirim from '../components/grafik/total-kirim.vue';
+import apiClient from '../../services/apiService';
+import "./grafik.css";
+
 
 const router = useRouter();
 const toast = useToast();

@@ -4,59 +4,88 @@
             <Toast />
 
             <!-- Button -->
-            <Toolbar class="mb-2">
+
+            <div class="grid">
+
+                <div class="col-4">
+                    <Toolbar class="mb-2">
+                        <template #start>
+                            <FileUpload ref="fileUpload" mode="advanced" :multiple="true"
+                                accept=".dcm,application/dicom,application/octet-stream" :maxFileSize="5000000000"
+                                label="Import" chooseLabel="Import" class="mr-2 inline-block" customUpload
+                                @uploader="uploadDicom">
+
+                                <!-- Slot untuk menambahkan tulisan/konten kustom di area drag -->
+                                <template #empty>
+                                    <div class="flex items-center justify-center flex-col py-4"
+                                        style="text-align: center;">
+                                        <i class="pi pi-cloud-upload text-gray-400"
+                                            style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
+                                        <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
+                                        <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file,
+                                            bisa pilih
+                                            banyak file sekaligus)</span>
+                                    </div>
+
+                                </template>
+
+                            </FileUpload>
+
+                            <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
+                        </template>
+                    </Toolbar>
+                </div>
+                <div class="col-6">
+                    <Toolbar class="mb-2">
+
+                        <template #start>
+                            <div class="">
+                                <MiniMonitoringView />
+                            </div>
+
+                            <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
+                        </template>
+                    </Toolbar>
+                </div>
+            </div>
+            <!-- <Toolbar class="mb-2">
+
                 <template #start>
-                   
-
-                    <FileUpload
-                        ref="fileUpload"
-                        mode="advanced"
-                        :multiple="true"
-                        accept=".dcm,application/dicom,application/octet-stream"
-                        :maxFileSize="5000000000"
-                        label="Import"
-                        chooseLabel="Import"
-                        class="mr-2 inline-block"
-
-                        customUpload
+                    <FileUpload ref="fileUpload" mode="advanced" :multiple="true"
+                        accept=".dcm,application/dicom,application/octet-stream" :maxFileSize="5000000000"
+                        label="Import" chooseLabel="Import" class="mr-2 inline-block" customUpload
                         @uploader="uploadDicom">
 
-                        <!-- Slot untuk menambahkan tulisan/konten kustom di area drag -->
                         <template #empty>
                             <div class="flex items-center justify-center flex-col py-4" style="text-align: center;">
-                                <i class="pi pi-cloud-upload text-gray-400" style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
+                                <i class="pi pi-cloud-upload text-gray-400"
+                                    style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
                                 <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
-                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file, bisa pilih banyak file sekaligus)</span>
+                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file, bisa pilih
+                                    banyak file sekaligus)</span>
                             </div>
-                          
+
                         </template>
 
                     </FileUpload>
-                    
-                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class="mr-2" @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
-                    <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
+
+                    <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
                 </template>
                 <template #end>
-                <div class="card" style="float right; width: 1100px; height: 300px; margin-top: -10px;">
-                    <MiniMonitoringView />
-                </div>
+                    <div class="w-full flex-1" style="max-width: 100%; min-width: 300px;">
+                        <MiniMonitoringView />
+                    </div>
                 </template>
-                <!-- <template #end>
-                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="mr-2"
-                        @click="confirmDeleteSelected"
-                        :disabled="!selectedPasiens || !selectedPasiens.length" />
-                    <Button label="Update" icon="pi pi-pencil" severity="info" @click="openEdit"
-                        :disabled="!selectedPasiens || !selectedPasiens.length" />
-                </template> -->
-            </Toolbar>
+            </Toolbar> -->
 
-            <DataTable ref="dt" :value="data" v-model:selection="selectedPasiens" dataKey="id" :paginator="true" :rows="10" :filters="filters"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5, 10, 25]"
+            <DataTable ref="dt" :value="data" v-model:selection="selectedPasiens" dataKey="id" :paginator="true"
+                :rows="10" :filters="filters"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                :rowsPerPageOptions="[5, 10, 25]"
                 currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} Data">
                 <template #header>
-                    <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                        <h3 class="m-0" style="padding-right: 550px;">Data Dicom Yang Telah Di Upload</h3>
+                    <div class="flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                        <h3 class="m-0">Data Dicom Yang Telah Di Upload</h3>
                         <IconField iconPosition="left">
                             <InputIcon>
                                 <i class="pi pi-search" />
@@ -64,25 +93,37 @@
                             <InputText v-model="filters['global'].value" placeholder="Search..." />
                         </IconField>
                     </div>
+                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class=""
+                        @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
+
                 </template>
 
                 <Column selectionMode="multiple" style="" :exportable="false"></Column>
                 <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
                 <Column field="accessionNumber" header="Accession Number" sortable style=""></Column>
                 <Column field="patientId" header="No RM" sortable style=""></Column>
-                <Column field="studyInstanceUid" header="Study Instance UID" sortable style=""></Column>
+                <Column field="studyInstanceUid" header="Study Instance UID" sortable style="max-width: 150px">
+                    <template #body="slotProps">
+                        <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
+                            v-tooltip.top="slotProps.data.studyInstanceUid">
+                            {{ slotProps.data.studyInstanceUid }}
+                        </div>
+                    </template>
+                </Column>
                 <Column field="message" header="Keterangan" sortable style=""></Column>
                 <Column header="Status Upload" sortable style="" field="status">
                     <template #body="slotProps">
-                        <Tag :severity="getUploadStatusSeverity(slotProps.data.status)" :value="getUploadStatusLabel(slotProps.data.status)" />
+                        <Tag :severity="getUploadStatusSeverity(slotProps.data.status)"
+                            :value="getUploadStatusLabel(slotProps.data.status)" />
                     </template>
                 </Column>
                 <Column header="Status Kirim" sortable style="" field="routerStatus">
                     <template #body="slotProps">
-                        <Tag :severity="getSendStatusSeverity(slotProps.data)" :value="getSendStatusLabel(slotProps.data)" />
+                        <Tag :severity="getSendStatusSeverity(slotProps.data)"
+                            :value="getSendStatusLabel(slotProps.data)" />
                     </template>
                 </Column>
-                <Column header="Aksi" :exportable="false" style="min-width: 14rem">
+                <Column header="Aksi" :exportable="false" style="min-width:7rem">
                     <template #body="slotProps">
                         <!-- Lihat Detail -->
                         <!-- <Button icon="pi pi-eye" rounded outlined class="mr-2"
@@ -91,58 +132,37 @@
                             severity="info" /> -->
 
                         <!-- Cek Service Request di SatuSehat -->
-                        <Button
-                            v-if="slotProps.data.accessionNumber"
-                            icon="pi pi-search"
-                            rounded outlined class="mr-2"
-                            v-tooltip.top="'Cek Service Request'"
-                            @click="checkServiceRequest(slotProps.data)"
-                            severity="help"
-                            :loading="slotProps.data._checkingSR" />
+                        <Button v-if="slotProps.data.accessionNumber" icon="pi pi-search" rounded outlined class="mr-2"
+                            v-tooltip.top="'Cek Service Request'" @click="checkServiceRequest(slotProps.data)"
+                            severity="help" :loading="slotProps.data._checkingSR" />
 
                         <!-- Tombol kirim pertama kali (belum dikirim / uploaded) -->
-                        <Button
-                            v-if="slotProps.data.status === 'UPLOADED'"
-                            icon="pi pi-send"
-                            rounded outlined class="mr-2"
-                            v-tooltip.top="'Kirim ke Router'"
-                            @click="sendDicom(slotProps.data)"
+                        <Button v-if="slotProps.data.status === 'UPLOADED'" icon="pi pi-send" rounded outlined
+                            class="mr-2" v-tooltip.top="'Kirim ke Router'" @click="sendDicom(slotProps.data)"
                             severity="success" />
 
                         <!-- Tombol retry: muncul saat gagal ke router ATAU gagal ke SatuSehat -->
-                        <Button
-                            v-if="isRetryable(slotProps.data)"
-                            icon="pi pi-replay"
-                            rounded outlined class="mr-2"
-                            v-tooltip.top="'Kirim Ulang'"
-                            @click="retryDicom(slotProps.data)"
-                            severity="warning"
+                        <Button v-if="isRetryable(slotProps.data)" icon="pi pi-replay" rounded outlined class="mr-2"
+                            v-tooltip.top="'Kirim Ulang'" @click="retryDicom(slotProps.data)" severity="warning"
                             :loading="slotProps.data._retrying" />
 
                         <!-- Indikator loading saat sedang mengirim -->
-                        <Button
-                            v-if="slotProps.data.status === 'SENDING'"
-                            icon="pi pi-spin pi-spinner"
-                            rounded outlined class="mr-2"
-                            severity="info"
-                            disabled />
+                        <Button v-if="slotProps.data.status === 'SENDING'" icon="pi pi-spin pi-spinner" rounded outlined
+                            class="mr-2" severity="info" disabled />
 
                         <!-- Sukses: tombol kirim di-disabled -->
-                        <Button
-                            v-if="slotProps.data.status === 'SENT' && slotProps.data.routerStatus === 'SUCCESS'"
-                            icon="pi pi-check"
-                            rounded outlined class="mr-2"
-                            severity="success"
-                            disabled />
+                        <Button v-if="slotProps.data.status === 'SENT' && slotProps.data.routerStatus === 'SUCCESS'"
+                            icon="pi pi-check" rounded outlined class="mr-2" severity="success" disabled />
                     </template>
                 </Column>
             </DataTable>
         </div>
 
-       
+
 
         <!-- Create Dialog -->
-        <Dialog v-model:visible="createDialog" :style="{ width: '450px' }" header="Tambah Pasien" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="createDialog" :style="{ width: '450px' }" header="Tambah Pasien" :modal="true"
+            class="p-fluid">
             <!-- Nama -->
             <div class="field">
                 <label for="nama">Nama</label>
@@ -160,7 +180,8 @@
             <!-- Jenis Kelamin -->
             <div class="field">
                 <label for="jenis_kelamin">Jenis Kelamin</label>
-                <Dropdown id="jenis_kelamin" v-model="data.jenis_kelamin" :options="jenisKelaminOptions" optionLabel="label" optionValue="value" placeholder="Pilih Jenis Kelamin" />
+                <Dropdown id="jenis_kelamin" v-model="data.jenis_kelamin" :options="jenisKelaminOptions"
+                    optionLabel="label" optionValue="value" placeholder="Pilih Jenis Kelamin" />
             </div>
 
             <!-- Tempat Lahir -->
@@ -195,7 +216,8 @@
         </Dialog>
 
         <!-- Edit Dialog -->
-        <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Data Pasien" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Data Pasien" :modal="true"
+            class="p-fluid">
             <!-- Nama -->
             <div class="field">
                 <label for="nama">Nama</label>
@@ -213,7 +235,8 @@
             <!-- Jenis Kelamin -->
             <div class="field">
                 <label for="jenis_kelamin">Jenis Kelamin</label>
-                <Dropdown id="jenis_kelamin" v-model="pasien.jenis_kelamin" :options="jenisKelaminOptions" optionLabel="label" optionValue="value" placeholder="Pilih Jenis Kelamin" />
+                <Dropdown id="jenis_kelamin" v-model="pasien.jenis_kelamin" :options="jenisKelaminOptions"
+                    optionLabel="label" optionValue="value" placeholder="Pilih Jenis Kelamin" />
             </div>
 
             <!-- Tempat Lahir -->
@@ -260,14 +283,15 @@
         </Dialog>
 
         <!-- Service Request Check Dialog -->
-        <Dialog v-model:visible="srDialog" :style="{ width: '520px' }" header="Cek Service Request SatuSehat" :modal="true">
+        <Dialog v-model:visible="srDialog" :style="{ width: '520px' }" header="Cek Service Request SatuSehat"
+            :modal="true">
             <div v-if="srLoading" class="flex justify-content-center py-4">
                 <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--primary-color);"></i>
             </div>
             <div v-else-if="srResult">
                 <div class="flex align-items-center gap-2 mb-3">
                     <i :class="srResult.found ? 'pi pi-check-circle' : 'pi pi-times-circle'"
-                       :style="{ fontSize: '1.5rem', color: srResult.found ? '#16a34a' : '#dc2626' }"></i>
+                        :style="{ fontSize: '1.5rem', color: srResult.found ? '#16a34a' : '#dc2626' }"></i>
                     <strong>{{ srResult.message }}</strong>
                 </div>
 
@@ -281,7 +305,8 @@
                         <div class="col-7" style="word-break: break-all;">{{ srResult.patientId || '-' }}</div>
                         <div class="col-5 font-semibold">Status</div>
                         <div class="col-7">
-                            <Tag :severity="srResult.status === 'active' ? 'success' : 'info'" :value="srResult.status || '-'" />
+                            <Tag :severity="srResult.status === 'active' ? 'success' : 'info'"
+                                :value="srResult.status || '-'" />
                         </div>
                     </div>
                 </div>
@@ -297,19 +322,24 @@
         </Dialog>
 
         <!-- Upload Progress Dialog -->
-        <Dialog v-model:visible="uploadProgressDialog" :style="{ width: '600px' }" header="Proses Upload" :modal="true" :closable="false">
+        <Dialog v-model:visible="uploadProgressDialog" :style="{ width: '600px' }" header="Proses Upload" :modal="true"
+            :closable="false">
             <div class="mb-3">
                 <ProgressBar :value="uploadProgressValue"></ProgressBar>
                 <div class="text-center mt-2">{{ uploadProgressText }}</div>
             </div>
             <div class="max-h-20rem overflow-y-auto">
-                <div v-for="(file, index) in uploadStatuses" :key="index" class="flex justify-content-between align-items-center p-2 border-bottom-1 surface-border">
-                    <span class="text-overflow-ellipsis overflow-hidden white-space-nowrap" style="max-width: 70%;" :title="file.name">{{ file.name }}</span>
-                    <Tag :severity="file.status === 'SUCCESS' ? 'success' : (file.status === 'FAILED' ? 'danger' : (file.status === 'DUPLICATE' ? 'warning' : 'info'))" :value="file.status"></Tag>
+                <div v-for="(file, index) in uploadStatuses" :key="index"
+                    class="flex justify-content-between align-items-center p-2 border-bottom-1 surface-border">
+                    <span class="text-overflow-ellipsis overflow-hidden white-space-nowrap" style="max-width: 70%;"
+                        :title="file.name">{{ file.name }}</span>
+                    <Tag :severity="file.status === 'SUCCESS' ? 'success' : (file.status === 'FAILED' ? 'danger' : (file.status === 'DUPLICATE' ? 'warning' : 'info'))"
+                        :value="file.status"></Tag>
                 </div>
             </div>
             <template #footer>
-                <Button label="Tutup" icon="pi pi-times" text @click="closeUploadProgressDialog" :disabled="isUploading" />
+                <Button label="Tutup" icon="pi pi-times" text @click="closeUploadProgressDialog"
+                    :disabled="isUploading" />
             </template>
         </Dialog>
     </div>
@@ -343,12 +373,12 @@ const getSendStatusSeverity = (rowData) => {
     if (status === 'UPLOADED') return 'secondary';
     if (status === 'SENDING') return 'info';
     if (status === 'FAILED') return 'danger';
-    
+
     // status is SENT
     if (routerStatus === 'SUCCESS') return 'success';
     if (routerStatus === 'FAILED') return 'danger';
     if (routerStatus === 'SENDING') return 'warning';
-    
+
     return 'info'; // SENT to router but not yet processed
 };
 
@@ -360,12 +390,12 @@ const getSendStatusLabel = (rowData) => {
     if (status === 'UPLOADED') return 'Belum Dikirim';
     if (status === 'SENDING') return 'Mengirim ke Router';
     if (status === 'FAILED') return 'Gagal ke Router';
-    
+
     // status is SENT
     if (routerStatus === 'SUCCESS') return 'Terkirim ke SatuSehat';
     if (routerStatus === 'FAILED') return 'Gagal ke SatuSehat';
     if (routerStatus === 'SENDING') return 'Router Memproses';
-    
+
     return 'Terkirim ke Router';
 };
 
@@ -508,7 +538,7 @@ const uploadDicom = async (event) => {
     isUploading.value = true;
     uploadProgressValue.value = 0;
     uploadProgressText.value = `Mengupload 0 dari ${files.length} file...`;
-    
+
     uploadStatuses.value = Array.from(files).map(f => ({ name: f.name, status: 'UPLOADING' }));
 
     try {
@@ -538,7 +568,7 @@ const uploadDicom = async (event) => {
         if (response.status === 200 || response.status === 201) {
             const resData = response.data;
             uploadProgressText.value = `Selesai: ${resData.sukses} sukses, ${resData.duplikat} duplikat, ${resData.gagal} gagal.`;
-            
+
             if (resData.hasil && resData.hasil.length === files.length) {
                 resData.hasil.forEach((h, i) => {
                     if (h.status === 'INVALID' || h.message.startsWith('Gagal')) {
@@ -603,11 +633,11 @@ const sendSelectedDicom = async () => {
 
         if (response.status === 200 || response.status === 201) {
             const resData = response.data;
-            toast.add({ 
-                severity: 'success', 
-                summary: 'Kirim Selesai', 
-                detail: `${resData.sukses} sukses dikirim ke router, ${resData.gagal} gagal.`, 
-                life: 5000 
+            toast.add({
+                severity: 'success',
+                summary: 'Kirim Selesai',
+                detail: `${resData.sukses} sukses dikirim ke router, ${resData.gagal} gagal.`,
+                life: 5000
             });
         }
 

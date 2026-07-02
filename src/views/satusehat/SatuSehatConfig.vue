@@ -1,30 +1,20 @@
 <template>
   <div class="satusehat-config">
     <div class="card">
-      <div class="card-header">
-        <h2>Konfigurasi SATUSEHAT API</h2>
-        <Button
-          label="Tambah Konfigurasi"
-          icon="pi pi-plus"
-          @click="openDialog()"
-          class="p-button-success"
-        />
-      </div>
 
-      <DataTable
-        :value="configs"
-        :loading="loading"
-        stripedRows
-        responsiveLayout="scroll"
-        class="p-datatable-sm"
-      >
+
+      <DataTable :value="configs" :loading="loading" stripedRows responsiveLayout="scroll" class="p-datatable-sm">
+        <template #header>
+          <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+            <h3 class="m-0" style="padding-right: 550px;">Konfigurasi SATUSEHAT API</h3>
+            <Button label="Tambah Konfigurasi" icon="pi pi-plus" @click="openDialog()" class="p-button-success" />
+          </div>
+        </template>
         <Column field="id" header="ID" :sortable="true" style="width: 80px"></Column>
         <Column field="environment" header="Environment" :sortable="true">
           <template #body="slotProps">
-            <Tag
-              :value="slotProps.data.environment === 'prod' ? 'Production' : 'Staging'"
-              :severity="slotProps.data.environment === 'prod' ? 'danger' : 'warning'"
-            />
+            <Tag :value="slotProps.data.environment === 'prod' ? 'Production' : 'Staging'"
+              :severity="slotProps.data.environment === 'prod' ? 'danger' : 'warning'" />
           </template>
         </Column>
         <Column field="organizationId" header="Organization ID" :sortable="true"></Column>
@@ -35,10 +25,8 @@
         </Column>
         <Column field="isActive" header="Status" :sortable="true" style="width: 120px">
           <template #body="slotProps">
-            <Tag
-              :value="slotProps.data.isActive ? 'Aktif' : 'Non-Aktif'"
-              :severity="slotProps.data.isActive ? 'success' : 'secondary'"
-            />
+            <Tag :value="slotProps.data.isActive ? 'Aktif' : 'Non-Aktif'"
+              :severity="slotProps.data.isActive ? 'success' : 'secondary'" />
           </template>
         </Column>
         <Column field="updatedAt" header="Terakhir Diubah" :sortable="true">
@@ -49,38 +37,18 @@
         <Column header="Aksi" style="width: 280px">
           <template #body="slotProps">
             <div class="action-buttons">
-              <Button
-                icon="pi pi-eye"
-                class="p-button-rounded p-button-info p-button-sm"
-                v-tooltip.top="'Lihat Detail'"
-                @click="viewDetail(slotProps.data)"
-              />
-              <Button
-                icon="pi pi-pencil"
-                class="p-button-rounded p-button-warning p-button-sm"
-                v-tooltip.top="'Edit'"
-                @click="openDialog(slotProps.data)"
-              />
-              <Button
-                v-if="!slotProps.data.isActive"
-                icon="pi pi-check"
-                class="p-button-rounded p-button-success p-button-sm"
-                v-tooltip.top="'Aktifkan'"
-                @click="activateConfig(slotProps.data.id)"
-              />
-              <Button
-                icon="pi pi-wifi"
-                class="p-button-rounded p-button-help p-button-sm"
-                v-tooltip.top="'Test Koneksi'"
-                @click="testConnection(slotProps.data.id)"
-              />
-              <Button
-                v-if="!slotProps.data.isActive"
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-danger p-button-sm"
-                v-tooltip.top="'Hapus'"
-                @click="confirmDelete(slotProps.data)"
-              />
+              <Button icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" v-tooltip.top="'Lihat Detail'"
+                @click="viewDetail(slotProps.data)" />
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-warning p-button-sm" v-tooltip.top="'Edit'"
+                @click="openDialog(slotProps.data)" />
+              <Button v-if="!slotProps.data.isActive" icon="pi pi-check"
+                class="p-button-rounded p-button-success p-button-sm" v-tooltip.top="'Aktifkan'"
+                @click="activateConfig(slotProps.data.id)" />
+              <Button icon="pi pi-wifi" class="p-button-rounded p-button-help p-button-sm"
+                v-tooltip.top="'Test Koneksi'" @click="testConnection(slotProps.data.id)" />
+              <Button v-if="!slotProps.data.isActive" icon="pi pi-trash"
+                class="p-button-rounded p-button-danger p-button-sm" v-tooltip.top="'Hapus'"
+                @click="confirmDelete(slotProps.data)" />
             </div>
           </template>
         </Column>
@@ -88,107 +56,59 @@
     </div>
 
     <!-- Dialog Form -->
-    <Dialog
-      v-model:visible="dialogVisible"
-      :header="editMode ? 'Edit Konfigurasi' : 'Tambah Konfigurasi'"
-      :modal="true"
-      :closable="true"
-      :style="{ width: '600px' }"
-    >
+    <Dialog v-model:visible="dialogVisible" :header="editMode ? 'Edit Konfigurasi' : 'Tambah Konfigurasi'" :modal="true"
+      :closable="true" :style="{ width: '600px' }">
       <div class="p-fluid">
         <div class="field">
           <label for="environment">Environment *</label>
-          <Dropdown
-            id="environment"
-            v-model="formData.environment"
-            :options="environmentOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Pilih Environment"
-          />
+          <Dropdown id="environment" v-model="formData.environment" :options="environmentOptions" optionLabel="label"
+            optionValue="value" placeholder="Pilih Environment" />
         </div>
 
         <div class="field">
           <label for="authBaseUrl">Auth Base URL *</label>
-          <InputText
-            id="authBaseUrl"
-            v-model="formData.authBaseUrl"
-            placeholder="https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1"
-          />
+          <InputText id="authBaseUrl" v-model="formData.authBaseUrl"
+            placeholder="https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1" />
         </div>
 
         <div class="field">
           <label for="fhirBaseUrl">FHIR Base URL *</label>
-          <InputText
-            id="fhirBaseUrl"
-            v-model="formData.fhirBaseUrl"
-            placeholder="https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1"
-          />
+          <InputText id="fhirBaseUrl" v-model="formData.fhirBaseUrl"
+            placeholder="https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1" />
         </div>
 
         <div class="field">
           <label for="organizationId">Organization ID *</label>
-          <InputText
-            id="organizationId"
-            v-model="formData.organizationId"
-            placeholder="Organization ID dari SATUSEHAT"
-          />
+          <InputText id="organizationId" v-model="formData.organizationId"
+            placeholder="Organization ID dari SATUSEHAT" />
         </div>
 
         <div class="field">
           <label for="clientId">Client ID *</label>
-          <InputText
-            id="clientId"
-            v-model="formData.clientId"
-            placeholder="Client ID dari SATUSEHAT"
-          />
+          <InputText id="clientId" v-model="formData.clientId" placeholder="Client ID dari SATUSEHAT" />
         </div>
 
         <div class="field">
           <label for="clientSecret">Client Secret *</label>
-          <Password
-            id="clientSecret"
-            v-model="formData.clientSecret"
-            :feedback="false"
-            toggleMask
-            placeholder="Client Secret dari SATUSEHAT"
-          />
+          <Password id="clientSecret" v-model="formData.clientSecret" :feedback="false" toggleMask
+            placeholder="Client Secret dari SATUSEHAT" />
         </div>
 
         <div class="field-checkbox">
-          <Checkbox
-            id="isActive"
-            v-model="formData.isActive"
-            :binary="true"
-          />
+          <Checkbox id="isActive" v-model="formData.isActive" :binary="true" />
           <label for="isActive">Set sebagai konfigurasi aktif</label>
         </div>
       </div>
 
       <template #footer>
-        <Button
-          label="Batal"
-          icon="pi pi-times"
-          @click="dialogVisible = false"
-          class="p-button-text"
-        />
-        <Button
-          label="Simpan"
-          icon="pi pi-check"
-          @click="saveConfig"
-          :loading="saving"
-        />
+        <Button label="Batal" icon="pi pi-times" @click="dialogVisible = false" class="p-button-text" />
+        <Button label="Simpan" icon="pi pi-check" @click="saveConfig" :loading="saving" />
       </template>
     </Dialog>
 
     <!-- Dialog Detail -->
-    <Dialog
-      v-model:visible="detailDialogVisible"
-      header="Detail Konfigurasi"
-      :modal="true"
-      :closable="true"
-      :style="{ width: '600px' }"
-    >
+    <Dialog v-model:visible="detailDialogVisible" header="Detail Konfigurasi" :modal="true" :closable="true"
+      :style="{ width: '600px' }">
       <div v-if="selectedConfig" class="config-detail">
         <div class="detail-row">
           <span class="label">ID:</span>
@@ -196,10 +116,8 @@
         </div>
         <div class="detail-row">
           <span class="label">Environment:</span>
-          <Tag
-            :value="selectedConfig.environment === 'prod' ? 'Production' : 'Staging'"
-            :severity="selectedConfig.environment === 'prod' ? 'danger' : 'warning'"
-          />
+          <Tag :value="selectedConfig.environment === 'prod' ? 'Production' : 'Staging'"
+            :severity="selectedConfig.environment === 'prod' ? 'danger' : 'warning'" />
         </div>
         <div class="detail-row">
           <span class="label">Auth Base URL:</span>
@@ -223,10 +141,8 @@
         </div>
         <div class="detail-row">
           <span class="label">Status:</span>
-          <Tag
-            :value="selectedConfig.isActive ? 'Aktif' : 'Non-Aktif'"
-            :severity="selectedConfig.isActive ? 'success' : 'secondary'"
-          />
+          <Tag :value="selectedConfig.isActive ? 'Aktif' : 'Non-Aktif'"
+            :severity="selectedConfig.isActive ? 'success' : 'secondary'" />
         </div>
         <div class="detail-row">
           <span class="label">Dibuat:</span>
@@ -244,30 +160,14 @@
     </Dialog>
 
     <!-- Confirm Delete Dialog -->
-    <Dialog
-      v-model:visible="deleteDialogVisible"
-      header="Konfirmasi Hapus"
-      :modal="true"
-      :style="{ width: '400px' }"
-    >
+    <Dialog v-model:visible="deleteDialogVisible" header="Konfirmasi Hapus" :modal="true" :style="{ width: '400px' }">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle" style="font-size: 2rem; color: #f59e0b"></i>
         <span>Apakah Anda yakin ingin menghapus konfigurasi ini?</span>
       </div>
       <template #footer>
-        <Button
-          label="Batal"
-          icon="pi pi-times"
-          @click="deleteDialogVisible = false"
-          class="p-button-text"
-        />
-        <Button
-          label="Hapus"
-          icon="pi pi-trash"
-          @click="deleteConfig"
-          class="p-button-danger"
-          :loading="deleting"
-        />
+        <Button label="Batal" icon="pi pi-times" @click="deleteDialogVisible = false" class="p-button-text" />
+        <Button label="Hapus" icon="pi pi-trash" @click="deleteConfig" class="p-button-danger" :loading="deleting" />
       </template>
     </Dialog>
   </div>
@@ -393,7 +293,7 @@ const saveConfig = async () => {
 
 const validateForm = () => {
   if (!formData.value.authBaseUrl || !formData.value.fhirBaseUrl ||
-      !formData.value.organizationId || !formData.value.clientId) {
+    !formData.value.organizationId || !formData.value.clientId) {
     toast.add({
       severity: 'warn',
       summary: 'Peringatan',
@@ -402,7 +302,7 @@ const validateForm = () => {
     });
     return false;
   }
-  
+
   if (!editMode.value && !formData.value.clientSecret) {
     toast.add({
       severity: 'warn',
@@ -412,7 +312,7 @@ const validateForm = () => {
     });
     return false;
   }
-  
+
   return true;
 };
 
@@ -521,7 +421,7 @@ onMounted(() => {
   padding: 1.5rem;
 }
 
-.card {
+/* .card {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -534,7 +434,7 @@ onMounted(() => {
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
-}
+} */
 
 .card-header h2 {
   margin: 0;

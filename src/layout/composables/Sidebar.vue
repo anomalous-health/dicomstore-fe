@@ -28,13 +28,13 @@
                                         <i class="pi pi-chevron-down"></i>
                                     </div> -->
                                     <ul class="list-none p-0 m-0 overflow-hidden">
-                                        <!-- <li>
+                                        <li>
                                             <a v-ripple href="/home"
                                                :class="[{ 'active': isActive('/home') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
                                                 <i class="pi pi-home mr-2"></i>
                                                 <span v-if="open" class="font-medium">Dashboard</span>
                                             </a>
-                                        </li> -->
+                                        </li>
                                        
                                         <li>
                                             <a v-ripple v-styleclass="{

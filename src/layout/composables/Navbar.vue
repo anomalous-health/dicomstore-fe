@@ -11,25 +11,25 @@
             </template>
             <template #end>
                 <div class="flex align-items-center gap-2">
-                    <div style="display:flex; align-items:center; gap:0.5rem">
+                    <!-- <div style="display:flex; align-items:center; gap:0.5rem">
                         <label>Pilih Tema:</label>
                         <select v-model="selectedTheme" @change="onThemeChange">
                             <option v-for="t in themes" :key="t" :value="t">{{ t }}</option>
                         </select>
-                        <!-- <div class="card flex justify-content-center">
+                        <div class="card flex justify-content-center">
                             <Dropdown v-model="selectedTheme" :options="themes" optionLabel="name" placeholder="Pilih Tema" class="w-full md:w-14rem" />
-                        </div> -->
+                        </div>
                         
-                    </div>
+                    </div> -->
 
                     <div class="toggle-container" @click="toggleDarkMode">
-                        <label>| Mode </label>
+                        <label> Mode </label>
                         <Button class="toggle-button">
                             <i :class="checked ? 'pi pi-moon' : 'pi pi-sun'"
                                 :style="{ color: checked ? 'yellow' : 'blue' }"></i>
                         </Button>
                     </div>
-                    <label class="blinking">| {{ userRole }}</label>
+                    <label class="blinking">{{ "| " + userRole + " |" }}</label>
 
                     <!--                    <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />-->
                     <div style="display: flex; align-items: center">
@@ -50,6 +50,7 @@
 import { ref, watch } from "vue";
 import { onMounted } from 'vue'
 import { useRouter } from "vue-router";
+import dashboard from "../../views/dashboard.vue";
 // import spongebobImg from "../../assets/spongebob.png";
 import apiClient from "../../services/apiService";
 
@@ -77,13 +78,13 @@ const fetchUserRole = async () => {
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) return;
 
-        const response = await apiClient.get("/me", {
+        const response = await apiClient.get("/auth/me", {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
 
-        userRole.value = response.data.user.role || '';
+        userRole.value = response.data.role || '';
     } catch (error) {
         console.error("Gagal mengambil role:", error.response?.data);
     }
@@ -159,11 +160,12 @@ const items = ref([
     {
         label: "Home",
         icon: "pi pi-home",
+        route: '/dashboard',
     },
-    {
-        label: "About Us",
-        icon: "pi pi-flag",
-    },
+    // {
+    //     label: "About Us",
+    //     icon: "pi pi-flag",
+    // },
     // {
     //     label: "Organization Structure",
     //     icon: "pi pi-users",

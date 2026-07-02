@@ -18,36 +18,6 @@ const routes = [
         component: dashboard,
       },
       {
-        path: "/posyandu/dashboard",
-        name: "PosyanduDashboard",
-        component: () => import("../views/posyandu/PosyanduDashboard.vue"),
-      },
-      {
-        path: "/posyandu/pendaftaran",
-        name: "PosyanduPendaftaran",
-        component: () => import("../views/posyandu/PosyanduPendaftaran.vue"),
-      },
-      {
-        path: "/posyandu/master",
-        name: "PosyanduMaster",
-        component: () => import("../views/posyandu/PosyanduMaster.vue"),
-      },
-      {
-        path: "/posyandu/jadwal",
-        name: "PosyanduJadwal",
-        component: () => import("../views/posyandu/PosyanduJadwal.vue"),
-      },
-      {
-        path: "/posyandu/kunjungan",
-        name: "PosyanduKunjungan",
-        component: () => import("../views/posyandu/PosyanduKunjungan.vue"),
-      },
-      {
-        path: "/posyandu/imunisasi",
-        name: "PosyanduImunisasi",
-        component: () => import("../views/posyandu/PosyanduImunisasi.vue"),
-      },
-      {
         path: "/auth/users",
         name: "AuthUsers",
         component: () => import("../views/auth/AuthUsers.vue"),
@@ -62,6 +32,11 @@ const routes = [
         name: "SatuSehatConfig",
         component: () => import("../views/satusehat/SatuSehatConfig.vue"),
       },
+      {
+        path: "/testing",
+        name: "Testing",
+        component: () => import("../components/grafik/total-kirim.vue"),
+      }
     ],
     beforeEnter: requireAuth,
   },
