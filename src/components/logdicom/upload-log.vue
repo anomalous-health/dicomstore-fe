@@ -12,30 +12,50 @@
                         <template #start>
                             <FileUpload ref="fileUpload" mode="advanced" :multiple="true"
                                 accept=".dcm,application/dicom,application/octet-stream" :maxFileSize="5000000000"
-                                label="Import" chooseLabel="Import" class="mr-2 inline-block" customUpload
-                                @uploader="uploadDicom">
+                                customUpload @uploader="uploadDicom">
 
-                                <!-- Slot untuk menambahkan tulisan/konten kustom di area drag -->
-                                <template #empty>
-                                    <div class="flex items-center justify-center flex-col py-4"
-                                        style="text-align: center;">
-                                        <i class="pi pi-cloud-upload text-gray-400"
-                                            style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
-                                        <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
-                                        <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file,
-                                            bisa pilih
-                                            banyak file sekaligus)</span>
+                                <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
+
+                                    <div class="flex justify-between items-center w-full">
+
+                                        <div class="flex gap-2">
+
+                                            <Button label="Import" icon="pi pi-file" @click="chooseCallback()" />
+
+                                            <Button label="Import Folder" icon="pi pi-folder-open" severity="secondary"
+                                                @click="triggerFolderInput" />
+
+                                            <Button label="Upload" icon="pi pi-upload" severity="success"
+                                                :disabled="!files || files.length === 0" @click="uploadCallback()" />
+
+                                            <Button label="Clear" icon="pi pi-times" severity="danger"
+                                                :disabled="!files || files.length === 0" @click="clearCallback()" />
+
+                                        </div>
+
                                     </div>
 
                                 </template>
 
+                                <template #empty>
+                                    <div class="flex flex-col items-center py-7 pl-8 ml-6">
+                                        <i class="pi pi-cloud-upload text-4xl mb-2"></i>
+                                        <span>Drag & Drop DICOM disini</span>
+                                    </div>
+                                </template>
+
                             </FileUpload>
+
+                            <input ref="folderInput" type="file" webkitdirectory directory multiple hidden
+                                @change="onFolderSelected" />
+
+
 
                             <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
                         </template>
                     </Toolbar>
                 </div>
-                <div class="col-6">
+                <div class="col-8">
                     <Toolbar class="mb-2">
 
                         <template #start>
@@ -98,9 +118,15 @@
                         @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
 
                 </template>
-                
+
 
                 <Column selectionMode="multiple" style="" :exportable="false"></Column>
+                <!-- <Column field="createdAt" header="Tanggal" :body="formatDate" sortable style=""></Column> -->
+                <Column field="createdAt" header="Tanggal" sortable>
+                    <template #body="{ data }">
+                        {{ formatTanggal(data.createdAt) }}
+                    </template>
+                </Column>
                 <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
                 <Column field="accessionNumber" header="Accession Number" sortable style=""></Column>
                 <Column field="patientId" header="No RM" sortable style=""></Column>
@@ -351,6 +377,57 @@
                     :disabled="isUploading" />
             </template>
         </Dialog>
+
+        <!-- Folder Scan Confirmation Dialog -->
+        <Dialog v-model:visible="folderConfirmDialog" :style="{ width: '520px' }" header="Konfirmasi Upload Folder"
+            :modal="true">
+            <div class="flex align-items-center gap-3 mb-3">
+                <i class="pi pi-folder-open" style="font-size: 2rem; color: var(--primary-color);"></i>
+                <div>
+                    <p class="m-0 font-semibold">{{ folderScanResult.folderName }}</p>
+                    <small class="text-gray-500">{{ folderScanResult.totalScanned }} file dipindai dari folder</small>
+                </div>
+            </div>
+
+            <div class="surface-ground border-round p-3 mb-3">
+                <div class="grid">
+                    <div class="col-7 font-semibold">File DICOM ditemukan</div>
+                    <div class="col-5">
+                        <Tag severity="success" :value="`${folderScanResult.dicomCount} file`"></Tag>
+                    </div>
+                    <div class="col-7 font-semibold">File non-DICOM (diabaikan)</div>
+                    <div class="col-5">
+                        <Tag severity="secondary" :value="`${folderScanResult.skippedCount} file`"></Tag>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="folderScanResult.dicomCount === 0" class="mb-3">
+                <Message severity="warn" :closable="false">Tidak ada file DICOM yang ditemukan dalam folder ini.
+                </Message>
+            </div>
+
+            <div v-if="folderScanResult.dicomCount > 0" class="mb-3">
+                <small class="text-gray-500">Contoh file yang akan diupload:</small>
+                <div class="max-h-10rem overflow-y-auto mt-1 surface-ground border-round p-2">
+                    <div v-for="(file, index) in folderScanResult.previewFiles" :key="index"
+                        class="text-sm py-1 border-bottom-1 surface-border">
+                        <i class="pi pi-file mr-1" style="font-size: 0.8rem;"></i>
+                        <span :title="file.path">{{ file.name }}</span>
+                        <small class="text-gray-400 ml-2">({{ formatFileSize(file.size) }})</small>
+                    </div>
+                    <div v-if="folderScanResult.dicomCount > 10" class="text-sm py-1 text-gray-400 text-center">
+                        ... dan {{ folderScanResult.dicomCount - 10 }} file lainnya
+                    </div>
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Batal" icon="pi pi-times" text @click="folderConfirmDialog = false" />
+                <Button label="Upload" icon="pi pi-upload" @click="uploadFolderFiles"
+                    :disabled="folderScanResult.dicomCount === 0" />
+            </template>
+        </Dialog>
     </div>
 </template>
 
@@ -372,6 +449,8 @@ import { useToast } from 'primevue/usetoast';
 import apiClient from '../../services/apiService';
 import { useRouter } from 'vue-router';
 import MiniMonitoringView from './MiniMonitoringView.vue';
+
+import {formatTanggal} from '../../utils/dateHelper.js';
 
 const getUploadStatusSeverity = (status) => {
     return status === 'INVALID' ? 'danger' : 'success';
@@ -462,6 +541,7 @@ const data = ref([]);
 const toast = useToast();
 const dt = ref();
 const fileUpload = ref(null);
+const folderInput = ref(null);
 const createDialog = ref(false);
 const editDialog = ref(false);
 const deleteDataDialog = ref(false);
@@ -479,9 +559,176 @@ const uploadProgressValue = ref(0);
 const uploadProgressText = ref('');
 const uploadStatuses = ref([]);
 
+// Folder upload state
+const folderConfirmDialog = ref(false);
+const folderDicomFiles = ref([]);
+const folderScanResult = ref({
+    folderName: '',
+    totalScanned: 0,
+    dicomCount: 0,
+    skippedCount: 0,
+    previewFiles: []
+});
+
 const closeUploadProgressDialog = () => {
     uploadProgressDialog.value = false;
     uploadStatuses.value = [];
+};
+
+// ---- Folder Upload Functions ----
+
+const triggerFolderInput = () => {
+    if (folderInput.value) {
+        folderInput.value.value = ''; // Reset agar bisa pilih folder yang sama
+        folderInput.value.click();
+    }
+};
+
+/**
+ * Cek apakah sebuah file kemungkinan adalah file DICOM.
+ * DICOM biasanya berekstensi .dcm, tapi kadang juga tanpa ekstensi.
+ * Kita filter berdasarkan ekstensi .dcm dan juga file tanpa ekstensi
+ * (karena banyak mesin DICOM menghasilkan file tanpa ekstensi).
+ */
+const isDicomFile = (file) => {
+    const name = file.name.toLowerCase();
+    // File dengan ekstensi .dcm
+    if (name.endsWith('.dcm')) return true;
+    // File DICOMDIR
+    if (name === 'dicomdir') return true;
+    return false;
+};
+
+const onFolderSelected = (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    // Ambil nama folder utama dari path file pertama
+    const firstPath = files[0].webkitRelativePath || '';
+    const folderName = firstPath.split('/')[0] || 'Folder';
+
+    // Filter hanya file DICOM
+    const dicomFiles = [];
+    const allFiles = Array.from(files);
+
+    for (const file of allFiles) {
+        if (isDicomFile(file)) {
+            dicomFiles.push(file);
+        }
+    }
+
+    // Simpan file DICOM untuk diupload nanti
+    folderDicomFiles.value = dicomFiles;
+
+    // Siapkan preview (max 10 file)
+    const previewFiles = dicomFiles.slice(0, 10).map(f => ({
+        name: f.name,
+        path: f.webkitRelativePath || f.name,
+        size: f.size
+    }));
+
+    folderScanResult.value = {
+        folderName,
+        totalScanned: allFiles.length,
+        dicomCount: dicomFiles.length,
+        skippedCount: allFiles.length - dicomFiles.length,
+        previewFiles
+    };
+
+    folderConfirmDialog.value = true;
+};
+
+const uploadFolderFiles = async () => {
+    const files = folderDicomFiles.value;
+    if (!files || files.length === 0) return;
+
+    folderConfirmDialog.value = false;
+
+    const formData = new FormData();
+    for (const file of files) {
+        formData.append('files', file);
+    }
+
+    uploadProgressDialog.value = true;
+    isUploading.value = true;
+    uploadProgressValue.value = 0;
+    uploadProgressText.value = `Mengupload 0 dari ${files.length} file DICOM dari folder...`;
+
+    uploadStatuses.value = files.map(f => ({
+        name: f.webkitRelativePath || f.name,
+        status: 'UPLOADING'
+    }));
+
+    try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'AccessToken tidak tersedia', life: 3000 });
+            isUploading.value = false;
+            return;
+        }
+
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        const response = await apiClient.post('/dicom/upload/batch', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                uploadProgressValue.value = percentCompleted;
+                if (percentCompleted === 100) {
+                    uploadProgressText.value = 'Memproses file di server...';
+                } else {
+                    uploadProgressText.value = `Mengupload: ${percentCompleted}%`;
+                }
+            }
+        });
+
+        if (response.status === 200 || response.status === 201) {
+            const resData = response.data;
+            uploadProgressText.value = `Selesai: ${resData.sukses} sukses, ${resData.duplikat} duplikat, ${resData.gagal} gagal.`;
+
+            if (resData.hasil && resData.hasil.length === files.length) {
+                resData.hasil.forEach((h, i) => {
+                    if (h.status === 'INVALID' || h.message.startsWith('Gagal')) {
+                        uploadStatuses.value[i].status = 'FAILED';
+                    } else if (h.message && h.message.startsWith('Duplikat')) {
+                        uploadStatuses.value[i].status = 'DUPLICATE';
+                        uploadStatuses.value[i].name += ' (Duplikat)';
+                    } else {
+                        uploadStatuses.value[i].status = 'SUCCESS';
+                    }
+                });
+            }
+
+            toast.add({
+                severity: 'success',
+                summary: 'Upload Folder Selesai',
+                detail: `${resData.sukses} sukses, ${resData.duplikat} duplikat, ${resData.gagal} gagal.`,
+                life: 5000
+            });
+
+            await fetchData();
+        }
+    } catch (error) {
+        console.error('Error uploading folder files:', error);
+        uploadProgressText.value = 'Upload gagal';
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Gagal mengupload file dari folder',
+            life: 3000
+        });
+    } finally {
+        isUploading.value = false;
+        uploadProgressValue.value = 100;
+        folderDicomFiles.value = [];
+    }
+};
+
+const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
 const jenisKelaminOptions = [

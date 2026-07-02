@@ -17,33 +17,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
-import { FilterMatchMode } from 'primevue/api';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import apiClient from '../services/apiService';
 import totalKirim from '../components/grafik/total-kirim.vue';
 
 const router = useRouter();
 const toast = useToast();
-const loading = ref(true);
-const patients = ref([]);
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+
+// Get user role from localStorage
+const userRole = computed(() => {
+  try {
+    return localStorage.getItem('role') || '';
+  } catch {
+    return '';
+  }
 });
-
-// Format tanggal ke format Indonesia
-const formatDate = (date) => {
-  if (!date) return '-';
-  return format(new Date(date), 'dd MMMM yyyy', { locale: id });
-};
-
-
-const viewDetails = (patient) => {
-  router.push(`/master/pasien/${patient.id}`);
-};
 
 onMounted(() => {
 });

@@ -130,7 +130,9 @@ import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
 import apiClient from "../../services/apiService";
-import "../posyandu/posyandu.css";
+// import "../posyandu/posyandu.css";
+import "../../assets/auth.css";
+
 
 const router = useRouter();
 const toast = useToast();
