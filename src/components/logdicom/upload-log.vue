@@ -112,7 +112,14 @@
                         </div>
                     </template>
                 </Column>
-                <Column field="message" header="Keterangan" sortable style=""></Column>
+                <Column field="message" header="Keterangan" sortable style="max-width: 150px;">
+                    <template #body="slotProps">
+                        <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
+                            v-tooltip.top="slotProps.data.message">
+                            {{ slotProps.data.message }}
+                        </div>
+                    </template>
+                </Column>
                 <Column header="Status Upload" sortable style="" field="status">
                     <template #body="slotProps">
                         <Tag :severity="getUploadStatusSeverity(slotProps.data.status)"

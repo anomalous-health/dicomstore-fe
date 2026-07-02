@@ -46,7 +46,6 @@ const viewDetails = (patient) => {
 };
 
 onMounted(() => {
-  fetchPatients();
 });
 </script>
 
