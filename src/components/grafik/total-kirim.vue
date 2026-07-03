@@ -39,6 +39,31 @@
             </div>
         </div>
 
+        <div class="grid mb-3">
+            <div class="col-12 md:col-6">
+                <div class="summary-card summary-card--web">
+                    <div class="summary-card__icon">
+                        <i class="pi pi-cloud-upload"></i>
+                    </div>
+                    <div class="summary-card__content">
+                        <span class="summary-card__label">Upload via Web</span>
+                        <span class="summary-card__value">{{ summaryData.web }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 md:col-6">
+                <div class="summary-card summary-card--scp">
+                    <div class="summary-card__icon">
+                        <i class="pi pi-desktop"></i>
+                    </div>
+                    <div class="summary-card__content">
+                        <span class="summary-card__label">Terima dari Modality (SCP)</span>
+                        <span class="summary-card__value">{{ summaryData.scp }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Chart Section -->
         <div class="grid">
             <div class="col-12">
@@ -115,7 +140,9 @@ const periodOptions = [
 const summaryData = ref({
     success: 0,
     failed: 0,
-    pending: 0
+    pending: 0,
+    web: 0,
+    scp: 0
 });
 
 // Chart data
@@ -236,7 +263,9 @@ const updateSummary = () => {
     summaryData.value = {
         success: items.filter(i => i.routerStatus === 'SUCCESS').length,
         failed: items.filter(i => i.status === 'FAILED' || i.routerStatus === 'FAILED').length,
-        pending: items.filter(i => i.routerStatus === null && i.status !== 'INVALID' && i.status !== 'FAILED').length
+        pending: items.filter(i => i.routerStatus === null && i.status !== 'INVALID' && i.status !== 'FAILED').length,
+        web: items.filter(i => i.source === 'WEB' || !i.source).length,
+        scp: items.filter(i => i.source === 'SCP').length
     };
 };
 
@@ -368,6 +397,16 @@ onMounted(() => {
 
 .summary-card--pending {
     background: linear-gradient(135deg, #78350f, #d97706);
+    color: #fff;
+}
+
+.summary-card--web {
+    background: linear-gradient(135deg, #374151, #4b5563);
+    color: #fff;
+}
+
+.summary-card--scp {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
     color: #fff;
 }
 

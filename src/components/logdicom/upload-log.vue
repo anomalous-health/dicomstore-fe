@@ -127,6 +127,18 @@
                         {{ formatTanggal(data.createdAt) }}
                     </template>
                 </Column>
+                <Column field="source" header="Source" sortable>
+                    <template #body="slotProps">
+                        <Tag v-if="slotProps.data.source === 'SCP'" severity="info" value="SCP" icon="pi pi-desktop"></Tag>
+                        <Tag v-else severity="secondary" value="WEB" icon="pi pi-cloud-upload"></Tag>
+                    </template>
+                </Column>
+                <Column field="callingAeTitle" header="Calling AE" sortable>
+                    <template #body="slotProps">
+                        <span v-if="slotProps.data.callingAeTitle">{{ slotProps.data.callingAeTitle }}</span>
+                        <span v-else class="text-gray-400">-</span>
+                    </template>
+                </Column>
                 <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
                 <Column field="accessionNumber" header="Accession Number" sortable style=""></Column>
                 <Column field="patientId" header="No RM" sortable style=""></Column>
