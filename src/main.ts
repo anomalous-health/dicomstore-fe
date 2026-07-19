@@ -28,7 +28,7 @@ try {
 		themeLink.rel = 'stylesheet'
 		document.head.appendChild(themeLink)
 	}
-	themeLink.href = `/node_modules/primevue/resources/themes/${savedTheme}/theme.css`
+	themeLink.href = `/themes/${savedTheme}/theme.css`
 } catch (e) {
 	// ignore when not running in browser or if access to localStorage/document is not available
 }

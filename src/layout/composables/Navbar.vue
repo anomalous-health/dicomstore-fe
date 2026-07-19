@@ -117,7 +117,7 @@ function switchTheme(theme) {
         themeLink.rel = 'stylesheet'
         document.head.appendChild(themeLink)
     }
-    themeLink.href = `/node_modules/primevue/resources/themes/${theme}/theme.css`
+    themeLink.href = `/themes/${theme}/theme.css`
     localStorage.setItem('pv-theme', theme)
 }
 
