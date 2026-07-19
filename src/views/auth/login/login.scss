@@ -9,7 +9,6 @@
 .container {
     width: 100%;
     background: rgba(0, 0, 0, 0.6); /* Tambahkan opasitas yang lebih tinggi */
-    background-image: url('../../../assets/logo/rs-polri.jpeg');
     background-repeat: no-repeat;
     background-size: cover;
     background-blend-mode: overlay; /* Multiply lebih efektif untuk efek gelap */
@@ -35,7 +34,7 @@
     height: 315px;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('../../../assets/logo/logo-rs-2.jpg');
+    // background-image: url('../../../assets/logo/logo-rs-2.jpg');
 }
 
 .flex-column {
