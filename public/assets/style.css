@@ -1,0 +1,24 @@
+/* src/assets/style.css */
+
+:root {
+    /* Mengatur Font Size Global */
+    --p-font-size: 14px; 
+    
+    /* Mengatur Line Height Global */
+    --p-content-line-height: 1.6;
+}
+
+body {
+    /* Jika variabel di atas tidak berefek karena versi PrimeVue lawas, 
+       gunakan cara standar ini */
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Kustomisasi komponen spesifik */
+.p-component {
+    font-size: 14px; /* Memastikan semua komponen PrimeVue mengikuti ukuran ini */
+}
