@@ -5,7 +5,7 @@
             <template #start>
                 <div class="flex align-items-center justify-content-between pt-3 flex-shrink-0">
                     <span class="inline-flex align-items-center gap-2" style="margin-bottom: 10px;">
-                        <img src="../../assets/jmt.png" width="40" height="40" alt="Logo" />
+                        <img src="../../assets/dicom.png" width="40" height="40" alt="Logo" />
                     </span>
                 </div>
             </template>
