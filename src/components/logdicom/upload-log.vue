@@ -7,7 +7,7 @@
 
             <div class="grid">
 
-                <div class="col-4">
+                <div class="col-12 lg:col-5">
                     <Toolbar class="mb-2">
                         <template #start>
                             <FileUpload ref="fileUpload" mode="advanced" :multiple="true"
@@ -15,30 +15,27 @@
                                 customUpload @uploader="uploadDicom">
 
                                 <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
-
                                     <div class="flex justify-between items-center w-full">
-
                                         <div class="flex gap-2">
-
-                                            <Button label="Import" icon="pi pi-file" @click="chooseCallback()" />
+                                            <Button label="Import" icon="pi pi-file" size="small"
+                                                class="text-xs px-2 py-1" @click="chooseCallback()" />
 
                                             <Button label="Import Folder" icon="pi pi-folder-open" severity="secondary"
-                                                @click="triggerFolderInput" />
+                                                size="small" class="text-xs px-2 py-1" @click="triggerFolderInput" />
 
-                                            <Button label="Upload" icon="pi pi-upload" severity="success"
-                                                :disabled="!files || files.length === 0" @click="uploadCallback()" />
+                                            <Button label="Upload" icon="pi pi-upload" severity="success" size="small"
+                                                class="text-xs px-2 py-1" :disabled="!files || files.length === 0"
+                                                @click="uploadCallback()" />
 
-                                            <Button label="Clear" icon="pi pi-times" severity="danger"
-                                                :disabled="!files || files.length === 0" @click="clearCallback()" />
-
+                                            <Button label="Clear" icon="pi pi-times" severity="danger" size="small"
+                                                class="text-xs px-2 py-1" :disabled="!files || files.length === 0"
+                                                @click="clearCallback()" />
                                         </div>
-
                                     </div>
-
                                 </template>
 
                                 <template #empty>
-                                    <div class="flex flex-col items-center py-7 pl-8 ml-6">
+                                    <div class="flex flex-col items-center py-7 pl-2 ml-6">
                                         <i class="pi pi-cloud-upload text-4xl mb-2"></i>
                                         <span>Drag & Drop DICOM disini</span>
                                     </div>
@@ -55,8 +52,8 @@
                         </template>
                     </Toolbar>
                 </div>
-                <div class="col-8">
-                    <Toolbar class="mb-2">
+                <div class="col-12 lg:col-7">
+                    <Toolbar class="mb-2" style="overflow-x: auto; min-width: 0; display: block;">
 
                         <template #start>
                             <div class="">
@@ -99,110 +96,117 @@
                 </template>
             </Toolbar> -->
 
-            <DataTable ref="dt" :value="data" v-model:selection="selectedPasiens" dataKey="id" :paginator="true"
-                :rows="10" :filters="filters"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25]"
-                currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} Data">
-                <template #header>
-                    <div class="flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
-                        <h3 class="m-0">Data Dicom Yang Telah Di Upload</h3>
-                        <IconField iconPosition="left">
-                            <InputIcon>
-                                <i class="pi pi-search" />
-                            </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
-                        </IconField>
-                    </div>
-                    <Button label="Kirim Terpilih" icon="pi pi-send" severity="success" class=""
-                        @click="sendSelectedDicom" :disabled="!selectedPasiens || !selectedPasiens.length" />
-
-                </template>
-
-
-                <Column selectionMode="multiple" style="" :exportable="false"></Column>
-                <!-- <Column field="createdAt" header="Tanggal" :body="formatDate" sortable style=""></Column> -->
-                <Column field="createdAt" header="Tanggal" sortable>
-                    <template #body="{ data }">
-                        {{ formatTanggal(data.createdAt) }}
-                    </template>
-                </Column>
-                <Column field="source" header="Source" sortable>
-                    <template #body="slotProps">
-                        <Tag v-if="slotProps.data.source === 'SCP'" severity="info" value="SCP" icon="pi pi-desktop"></Tag>
-                        <Tag v-else severity="secondary" value="WEB" icon="pi pi-cloud-upload"></Tag>
-                    </template>
-                </Column>
-                <Column field="callingAeTitle" header="Calling AE" sortable>
-                    <template #body="slotProps">
-                        <span v-if="slotProps.data.callingAeTitle">{{ slotProps.data.callingAeTitle }}</span>
-                        <span v-else class="text-gray-400">-</span>
-                    </template>
-                </Column>
-                <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
-                <Column field="accessionNumber" header="Accession Number" sortable style=""></Column>
-                <Column field="patientId" header="No RM" sortable style=""></Column>
-                <Column field="studyInstanceUid" header="Study Instance UID" sortable style="max-width: 150px">
-                    <template #body="slotProps">
-                        <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
-                            v-tooltip.top="slotProps.data.studyInstanceUid">
-                            {{ slotProps.data.studyInstanceUid }}
+            <div class="overflow-x-auto w-full">
+                <DataTable ref="dt" :value="data" v-model:selection="selectedPasiens" dataKey="id" :paginator="true"
+                    :rows="10" :filters="filters" class="p-datatable-sm"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    :rowsPerPageOptions="[5, 10, 25]"
+                    currentPageReportTemplate="Menampilkan {first} - {last} dari {totalRecords} Data"
+                    responsiveLayout="scroll">
+                    <template #header>
+                        <div class="flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+                            <h3 class="m-0">Data Dicom Yang Telah Di Upload</h3>
+                            <div class="flex flex-wrap gap-2 align-items-center">
+                                <Button label="Kirim Terpilih" icon="pi pi-send" severity="success"
+                                    @click="sendSelectedDicom"
+                                    :disabled="!selectedPasiens || !selectedPasiens.length" />
+                                <IconField iconPosition="left">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                </IconField>
+                            </div>
                         </div>
                     </template>
-                </Column>
-                <Column field="message" header="Keterangan" sortable style="max-width: 150px;">
-                    <template #body="slotProps">
-                        <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
-                            v-tooltip.top="slotProps.data.message">
-                            {{ slotProps.data.message }}
-                        </div>
-                    </template>
-                </Column>
-                <Column header="Status Upload" sortable style="" field="status">
-                    <template #body="slotProps">
-                        <Tag :severity="getUploadStatusSeverity(slotProps.data.status)"
-                            :value="getUploadStatusLabel(slotProps.data.status)" />
-                    </template>
-                </Column>
-                <Column header="Status Kirim" sortable style="" field="routerStatus">
-                    <template #body="slotProps">
-                        <Tag :severity="getSendStatusSeverity(slotProps.data)"
-                            :value="getSendStatusLabel(slotProps.data)" />
-                    </template>
-                </Column>
-                <Column header="Aksi" :exportable="false" style="min-width:7rem">
-                    <template #body="slotProps">
-                        <!-- Lihat Detail -->
-                        <!-- <Button icon="pi pi-eye" rounded outlined class="mr-2"
+
+
+                    <Column selectionMode="multiple" style="" :exportable="false"></Column>
+                    <!-- <Column field="createdAt" header="Tanggal" :body="formatDate" sortable style=""></Column> -->
+                    <Column field="createdAt" header="Tanggal" sortable>
+                        <template #body="{ data }">
+                            {{ formatTanggal(data.createdAt) }}
+                        </template>
+                    </Column>
+                    <Column field="source" header="Source" sortable>
+                        <template #body="slotProps">
+                            <Tag v-if="slotProps.data.source === 'SCP'" severity="info" value="SCP"
+                                icon="pi pi-desktop"></Tag>
+                            <Tag v-else severity="secondary" value="WEB" icon="pi pi-cloud-upload"></Tag>
+                        </template>
+                    </Column>
+                    <Column field="callingAeTitle" header="Calling AE" sortable>
+                        <template #body="slotProps">
+                            <span v-if="slotProps.data.callingAeTitle">{{ slotProps.data.callingAeTitle }}</span>
+                            <span v-else class="text-gray-400">-</span>
+                        </template>
+                    </Column>
+                    <Column field="patientName" header="Nama Pasien" sortable style=""></Column>
+                    <Column field="accessionNumber" header="Accession Number" sortable style=""></Column>
+                    <Column field="patientId" header="No RM" sortable style=""></Column>
+                    <Column field="studyInstanceUid" header="Study Instance UID" sortable style="max-width: 150px">
+                        <template #body="slotProps">
+                            <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
+                                v-tooltip.top="slotProps.data.studyInstanceUid">
+                                {{ slotProps.data.studyInstanceUid }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="message" header="Keterangan" sortable style="max-width: 150px;">
+                        <template #body="slotProps">
+                            <div class="text-overflow-ellipsis overflow-hidden white-space-nowrap"
+                                v-tooltip.top="slotProps.data.message">
+                                {{ slotProps.data.message }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column header="Status Upload" sortable style="" field="status">
+                        <template #body="slotProps">
+                            <Tag :severity="getUploadStatusSeverity(slotProps.data.status)"
+                                :value="getUploadStatusLabel(slotProps.data.status)" />
+                        </template>
+                    </Column>
+                    <Column header="Status Kirim" sortable style="" field="routerStatus">
+                        <template #body="slotProps">
+                            <Tag :severity="getSendStatusSeverity(slotProps.data)"
+                                :value="getSendStatusLabel(slotProps.data)" />
+                        </template>
+                    </Column>
+                    <Column header="Aksi" :exportable="false" style="min-width:7rem">
+                        <template #body="slotProps">
+                            <!-- Lihat Detail -->
+                            <!-- <Button icon="pi pi-eye" rounded outlined class="mr-2"
                             v-tooltip.top="'Lihat Detail'"
                             @click="viewDetails(slotProps.data)"
                             severity="info" /> -->
 
-                        <!-- Cek Service Request di SatuSehat -->
-                        <Button v-if="slotProps.data.accessionNumber" icon="pi pi-search" rounded outlined class="mr-2"
-                            v-tooltip.top="'Cek Service Request'" @click="checkServiceRequest(slotProps.data)"
-                            severity="help" :loading="slotProps.data._checkingSR" />
+                            <!-- Cek Service Request di SatuSehat -->
+                            <Button v-if="slotProps.data.accessionNumber" icon="pi pi-search" rounded outlined
+                                class="mr-2" v-tooltip.top="'Cek Service Request'"
+                                @click="checkServiceRequest(slotProps.data)" severity="help"
+                                :loading="slotProps.data._checkingSR" />
 
-                        <!-- Tombol kirim pertama kali (belum dikirim / uploaded) -->
-                        <Button v-if="slotProps.data.status === 'UPLOADED'" icon="pi pi-send" rounded outlined
-                            class="mr-2" v-tooltip.top="'Kirim ke Router'" @click="sendDicom(slotProps.data)"
-                            severity="success" />
+                            <!-- Tombol kirim pertama kali (belum dikirim / uploaded) -->
+                            <Button v-if="slotProps.data.status === 'UPLOADED'" icon="pi pi-send" rounded outlined
+                                class="mr-2" v-tooltip.top="'Kirim ke Router'" @click="sendDicom(slotProps.data)"
+                                severity="success" />
 
-                        <!-- Tombol retry: muncul saat gagal ke router ATAU gagal ke SatuSehat -->
-                        <Button v-if="isRetryable(slotProps.data)" icon="pi pi-replay" rounded outlined class="mr-2"
-                            v-tooltip.top="'Kirim Ulang'" @click="retryDicom(slotProps.data)" severity="warning"
-                            :loading="slotProps.data._retrying" />
+                            <!-- Tombol retry: muncul saat gagal ke router ATAU gagal ke SatuSehat -->
+                            <Button v-if="isRetryable(slotProps.data)" icon="pi pi-replay" rounded outlined class="mr-2"
+                                v-tooltip.top="'Kirim Ulang'" @click="retryDicom(slotProps.data)" severity="warning"
+                                :loading="slotProps.data._retrying" />
 
-                        <!-- Indikator loading saat sedang mengirim -->
-                        <Button v-if="slotProps.data.status === 'SENDING'" icon="pi pi-spin pi-spinner" rounded outlined
-                            class="mr-2" severity="info" disabled />
+                            <!-- Indikator loading saat sedang mengirim -->
+                            <Button v-if="slotProps.data.status === 'SENDING'" icon="pi pi-spin pi-spinner" rounded
+                                outlined class="mr-2" severity="info" disabled />
 
-                        <!-- Sukses: tombol kirim di-disabled -->
-                        <Button v-if="slotProps.data.status === 'SENT' && slotProps.data.routerStatus === 'SUCCESS'"
-                            icon="pi pi-check" rounded outlined class="mr-2" severity="success" disabled />
-                    </template>
-                </Column>
-            </DataTable>
+                            <!-- Sukses: tombol kirim di-disabled -->
+                            <Button v-if="slotProps.data.status === 'SENT' && slotProps.data.routerStatus === 'SUCCESS'"
+                                icon="pi pi-check" rounded outlined class="mr-2" severity="success" disabled />
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
         </div>
 
 
@@ -462,7 +466,7 @@ import apiClient from '../../services/apiService';
 import { useRouter } from 'vue-router';
 import MiniMonitoringView from './MiniMonitoringView.vue';
 
-import {formatTanggal} from '../../utils/dateHelper.js';
+import { formatTanggal } from '../../utils/dateHelper.js';
 
 const getUploadStatusSeverity = (status) => {
     return status === 'INVALID' ? 'danger' : 'success';
