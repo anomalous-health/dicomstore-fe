@@ -5,7 +5,7 @@
       
       <h1 class="mb-4">Selamat Datang di Dashboard {{ userRole }}</h1>
 
-      <div class="grid">
+      <!-- <div class="grid">
         <div class="col-12 md:col-6 lg:col-4">
           <div class="surface-card shadow-2 p-3 border-round mb-3" style="border-left: 6px solid var(--blue-500)">
             <div class="flex justify-content-between mb-3">
@@ -27,7 +27,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="grid">
         <div class="col-12">
