@@ -1,8 +1,7 @@
 # DicomStore
 
-cara install dan menjalankannya
+using node 20
 
 - npm install
-- sesuaikan koeksi dengan backend nya 
+- setup env
 - npm run dev
-- backend nya [https://github.com/zaelanirizal02/dicomstore-be]
