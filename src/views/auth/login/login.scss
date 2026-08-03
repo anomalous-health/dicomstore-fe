@@ -1,73 +1,493 @@
-.login-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    /* background-color: #f0f0f0; */
-    /* optional, for better visibility */
+// ── Minimalist Login · Split layout · Emerald theme ───────────────────────
+$em-500: #10b981;
+$em-600: #059669;
+$em-700: #047857;
+
+// Full-page 2-column split
+.login-page {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
-.container {
+
+// ── Keyframes ──────────────────────────────────────────────────────────────
+@keyframes scan-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.6;  transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes ekg-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes core-ping {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+  50%       { box-shadow: 0 0 0 14px rgba(255,255,255,0); }
+}
+
+@keyframes blip-pulse {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  40%, 60% { opacity: 1;  transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes scanner-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.6;  transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes text-reveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes text-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+// ── Kiri: Emerald-700 branding ─────────────────────────────────────────────
+.panel-brand {
+  // Gradient: emerald-900 → emerald-700 → teal-600
+  background: linear-gradient(145deg, #064e3b 0%, #047857 55%, #0d9488 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem 3rem;
+  overflow: hidden;
+  position: relative;
+
+  // Dot grid overlay
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size: 26px 26px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Decorative large ring — top right
+  &::after {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    border: 48px solid rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // All direct children above overlays
+  > * { position: relative; z-index: 1; }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.brand-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+  align-self: flex-start;
+
+  // Glassmorphism pill
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 0.45rem 1rem 0.45rem 0.6rem;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.brand-name {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.brand-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: auto;
+}
+
+.brand-logo-img {
+  height: 110px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  object-fit: contain;
+  margin-top: -1rem;
+
+  &.satusehat { height: 44px; margin-top: 0; }
+}
+
+.brand-center {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-tagline {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-align: center;
+
+  // Shimmer gradient text
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #ffffff 30%,
+    #6ee7b7 45%,
+    #ffffff 60%,
+    #ffffff 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  // Entrance + continuous shimmer
+  animation:
+    text-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both,
+    text-shimmer 5s linear infinite 1s;
+}
+
+// ── Radiology scanner ──────────────────────────────────────────────────────
+.radio-scan {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 2rem;
+  flex-shrink: 0;
+  animation: scanner-float 4s ease-in-out infinite;
+
+  // Glow bloom behind rings
+  &::before {
+    content: '';
+    position: absolute;
+    width: 260px; height: 260px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.45) 0%, transparent 70%);
+    filter: blur(18px);
+    animation: glow-breathe 2.4s ease-in-out infinite;
+    z-index: 0;
+  }
+}
+
+.scan-ring {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+
+  &.r1 {
+    width: 220px; height: 220px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    animation: ring-pulse 2.4s ease-in-out infinite;
+  }
+  &.r2 {
+    width: 160px; height: 160px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    animation: ring-pulse 2.4s ease-in-out infinite 0.4s;
+  }
+  &.r3 {
+    width: 100px; height: 100px;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    animation: ring-pulse 2.4s ease-in-out infinite 0.8s;
+  }
+}
+
+// Crosshair
+.scan-cross {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  top: 50%; left: 50%;
+
+  &.ch-h {
+    width: 220px; height: 1px;
+    transform: translate(-50%, -50%);
+  }
+  &.ch-v {
+    width: 1px; height: 220px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Corner brackets
+.scan-bracket {
+  position: absolute;
+  width: 18px; height: 18px;
+
+  &.br-tl { top: 0;   left: 0;   border-top: 2px solid rgba(255,255,255,0.6); border-left:  2px solid rgba(255,255,255,0.6); }
+  &.br-tr { top: 0;   right: 0;  border-top: 2px solid rgba(255,255,255,0.6); border-right: 2px solid rgba(255,255,255,0.6); }
+  &.br-bl { bottom: 0; left: 0;  border-bottom: 2px solid rgba(255,255,255,0.6); border-left:  2px solid rgba(255,255,255,0.6); }
+  &.br-br { bottom: 0; right: 0; border-bottom: 2px solid rgba(255,255,255,0.6); border-right: 2px solid rgba(255,255,255,0.6); }
+}
+
+// Sweep beams
+.scan-sweep {
+  position: absolute;
+  width: 220px; height: 220px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 65%,
+    rgba(52, 211, 153, 0.12) 80%,
+    rgba(52, 211, 153, 0.5) 100%
+  );
+  animation: scan-rotate 3s linear infinite;
+  z-index: 1;
+
+  &.sweep-counter {
+    width: 140px; height: 140px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      transparent 75%,
+      rgba(255, 255, 255, 0.06) 88%,
+      rgba(255, 255, 255, 0.18) 100%
+    );
+    animation: scan-rotate 5s linear infinite reverse;
+  }
+}
+
+// Orbit dots around r2
+.orbit-wrap {
+  position: absolute;
+  width: 160px; height: 160px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  &.ow-1 { animation: orbit-spin 6s linear infinite; }
+  &.ow-2 { animation: orbit-spin 6s linear infinite reverse; animation-delay: -2s; }
+  &.ow-3 { animation: orbit-spin 9s linear infinite; animation-delay: -3s; }
+}
+
+.orbit-dot {
+  position: absolute;
+  width: 7px; height: 7px;
+  background: #34d399;
+  border-radius: 50%;
+  top: -3.5px;
+  left: calc(50% - 3.5px);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.9), 0 0 16px rgba(52, 211, 153, 0.4);
+}
+
+// Cardinal blips on r1
+.scan-blip {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: rgba(52, 211, 153, 0.9);
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+
+  &.blip-n { transform: translate(-50%, calc(-50% - 110px)); animation: blip-pulse 3s ease-in-out infinite; }
+  &.blip-e { transform: translate(calc(-50% + 110px), -50%); animation: blip-pulse 3s ease-in-out infinite 0.75s; }
+  &.blip-s { transform: translate(-50%, calc(-50% + 110px)); animation: blip-pulse 3s ease-in-out infinite 1.5s; }
+  &.blip-w { transform: translate(calc(-50% - 110px), -50%); animation: blip-pulse 3s ease-in-out infinite 2.25s; }
+}
+
+// Center dot
+.scan-core {
+  position: absolute;
+  width: 12px; height: 12px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: core-ping 2.4s ease-in-out infinite;
+  z-index: 2;
+  box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 24px rgba(52,211,153,0.5);
+}
+
+// ── EKG line ───────────────────────────────────────────────────────────────
+.ekg-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  overflow: hidden;
+  // Fade edges
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.ekg-svg {
+  display: block;
+  width: 100%;
+  height: 64px;
+  animation: ekg-scroll 4s linear infinite;
+}
+
+.ekg-path {
+  fill: none;
+  stroke: rgba(52, 211, 153, 0.7);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.6));
+}
+
+
+// ── Kanan: Form putih ──────────────────────────────────────────────────────
+.panel-form {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-logo {
+  height: 130px;
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.form-inner {
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  z-index: 1;
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+  }
+}
+
+.form-subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 2rem;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .required { color: $em-600; }
+
+  .p-inputtext {
     width: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Tambahkan opasitas yang lebih tinggi */
-    background-image: url('../../../assets/logo/rs-polri.jpeg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-blend-mode: overlay; /* Multiply lebih efektif untuk efek gelap */
-}
-
-.container-login {
-    width: 780px;
-    height: 445px;
-    padding: 15px;
-    background: linear-gradient(135deg, rgba(121, 124, 130, 0.8), rgba(10, 53, 97, 0.8)); /* Gradasi dari biru gelap ke biru muda */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-color: #e5e7eb;
     border-radius: 8px;
+    font-size: 0.9rem;
+    color: #111827;
+
+    &::placeholder { color: #9ca3af; }
+    &:hover  { border-color: $em-500; }
+    &:focus  {
+      border-color: $em-500;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.18);
+      outline: none;
+    }
+  }
 }
 
-.login-side{
-    float: right;
-    padding-left: 5rem;
-    padding-top: 5rem;
+.login-btn {
+  width: 100%;
+  background: $em-500 !important;
+  border-color: $em-500 !important;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: $em-600 !important;
+    border-color: $em-600 !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px $em-500 !important;
+  }
 }
 
-.gambar-side{
-    width: 350px;
-    height: 315px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-image: url('../../../assets/logo/logo-rs-2.jpg');
-}
+// Dekorasi lingkaran kanan bawah (seperti gear di referensi)
+.deco-circles {
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 40px solid rgba(16, 185, 129, 0.07);
+  pointer-events: none;
 
-.flex-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.align-items-center {
-    align-items: center;
-}
-
-.justify-content-center {
-    justify-content: center;
-}
-
-.gap-3 {
-    gap: 1rem;
-}
-
-.py-5 {
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
-}
-
-.w-5rem {
-    width: 5rem;
-}
-
-.w-12rem {
-    width: 12rem;
-}
-
-.w-10rem {
-    width: 10rem;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    border-radius: 50%;
+    border: 30px solid rgba(16, 185, 129, 0.04);
+  }
 }

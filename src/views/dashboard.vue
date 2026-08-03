@@ -1,42 +1,34 @@
 <template>
-  <div class="content-table">
-    <div class="card">
-      <Toast />
-      
-      <h1 class="mb-4">Selamat Datang di Dashboard {{ userRole }}</h1>
+  <div class="dash-page">
+    <Toast />
 
-      <!-- <div class="grid">
-        <div class="col-12 md:col-6 lg:col-4">
-          <div class="surface-card shadow-2 p-3 border-round mb-3" style="border-left: 6px solid var(--blue-500)">
-            <div class="flex justify-content-between mb-3">
-              <div>
-                <span class="block text-500 font-medium mb-2">Status SCP Listener</span>
-                <div class="text-900 font-medium text-xl">
-                  <Tag v-if="scpStatus.running" severity="success" value="RUNNING"></Tag>
-                  <Tag v-else severity="danger" value="STOPPED"></Tag>
-                </div>
-              </div>
-              <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                <i class="pi pi-desktop text-blue-500 text-xl"></i>
-              </div>
-            </div>
-            <span class="text-green-500 font-medium">{{ scpStatus.activeConnections }} </span>
-            <span class="text-500">koneksi aktif</span>
-            <div class="mt-2 text-sm text-600">
-              AE Title: <strong>{{ scpStatus.aeTitle || '-' }}</strong> | Port: <strong>{{ scpStatus.port || '-' }}</strong>
-            </div>
-          </div>
+    <!-- ── Page Header ─────────────────────────────────────────────────── -->
+    <div class="dash-header">
+      <div class="dash-header__left">
+        <p class="dash-header__greeting">Selamat Datang 👋</p>
+        <h1 class="dash-header__title">{{ userRole || 'Dashboard' }}</h1>
+        <p class="dash-header__date">{{ currentDate }}</p>
+      </div>
+
+      <!-- SCP Status Card -->
+      <div class="scp-card" :class="scpStatus.running ? 'scp-card--up' : 'scp-card--down'">
+        <div class="scp-card__indicator" />
+        <div class="scp-card__body">
+          <span class="scp-card__label">SCP Listener</span>
+          <span class="scp-card__status">{{ scpStatus.running ? 'RUNNING' : 'STOPPED' }}</span>
+          <span class="scp-card__meta" v-if="scpStatus.running">
+            AE: <b>{{ scpStatus.aeTitle || '-' }}</b> &nbsp;·&nbsp; Port: <b>{{ scpStatus.port || '-' }}</b>
+          </span>
         </div>
-      </div> -->
-
-      <div class="grid">
-        <div class="col-12">
-          <Panel header="" class="mb-3">
-           <totalKirim/>
-          </Panel>
+        <div class="scp-card__connections" v-if="scpStatus.running">
+          <span class="scp-connections__count">{{ scpStatus.activeConnections }}</span>
+          <span class="scp-connections__label">koneksi aktif</span>
         </div>
       </div>
     </div>
+
+    <!-- ── Content ─────────────────────────────────────────────────────── -->
+    <totalKirim />
   </div>
 </template>
 
@@ -44,6 +36,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import { format } from 'date-fns';
+import { id as localeId } from 'date-fns/locale';
 import apiClient from '../services/apiService';
 import totalKirim from '../components/grafik/total-kirim.vue';
 
@@ -57,14 +51,13 @@ const scpStatus = ref({
   activeConnections: 0
 });
 
-// Get user role from localStorage
 const userRole = computed(() => {
-  try {
-    return localStorage.getItem('role') || '';
-  } catch {
-    return '';
-  }
+  try { return localStorage.getItem('role') || ''; } catch { return ''; }
 });
+
+const currentDate = computed(() =>
+  format(new Date(), "EEEE, dd MMMM yyyy", { locale: localeId })
+);
 
 const fetchScpStatus = async () => {
   try {
@@ -81,25 +74,140 @@ const fetchScpStatus = async () => {
 
 onMounted(() => {
   fetchScpStatus();
-  // Set interval to refresh active connections every 5 seconds
   const interval = setInterval(fetchScpStatus, 5000);
-  // cleanup on unmount
   return () => clearInterval(interval);
 });
 </script>
 
 <style scoped>
-.card {
-  padding: 0.5rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
+.dash-page {
+  padding: 1.5rem;
+  max-width: 1600px;
 }
 
-:deep(.p-panel) {
-  margin-bottom: 1rem;
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
 }
 
-:deep(.p-datatable) {
-  margin-top: 1rem;
+.dash-header__greeting {
+  margin: 0 0 0.15rem;
+  font-size: 0.875rem;
+  color: var(--text-color-secondary, #6b7280);
+}
+
+.dash-header__title {
+  margin: 0 0 0.2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-color, #111827);
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+}
+
+.dash-header__date {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary, #9ca3af);
+}
+
+/* ── SCP Status Card ─────────────────────────────────────────────────────── */
+.scp-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid;
+  min-width: 260px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scp-card--up {
+  background: #f0fdf4;
+  border-color: #a7f3d0;
+}
+
+.scp-card--down {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+/* Pulse indicator dot */
+.scp-card__indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.scp-card--up .scp-card__indicator {
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  animation: scp-pulse 2s ease-in-out infinite;
+}
+
+.scp-card--down .scp-card__indicator {
+  background: #ef4444;
+}
+
+@keyframes scp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+}
+
+.scp-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.scp-card__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-color-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.scp-card__status {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.scp-card--up .scp-card__status   { color: #047857; }
+.scp-card--down .scp-card__status { color: #b91c1c; }
+
+.scp-card__meta {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary, #6b7280);
+}
+
+.scp-card__connections {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 1rem;
+  border-left: 1px solid #a7f3d0;
+}
+
+.scp-connections__count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #047857;
+  line-height: 1;
+}
+
+.scp-connections__label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  white-space: nowrap;
 }
 </style>

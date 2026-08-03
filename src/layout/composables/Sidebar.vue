@@ -14,100 +14,86 @@
                             </span> -->
                         </div>
                         <div class="overflow-y-auto">
-                            <ul class="list-none p-3 m-0">
+                            <ul class="nav-root">
+
+                                <!-- Section label -->
+                                <li v-if="open" class="nav-section-label">NAVIGASI</li>
+
+                                <!-- Dashboard -->
                                 <li>
-                                    <!-- <div v-ripple v-styleclass="{
-                                        selector: '@next',
-                                        enterClass: 'hidden',
-                                        enterActiveClass: 'slidedown',
-                                        leaveToClass: 'hidden',
-                                        leaveActiveClass: 'slideup'
-                                    }"
-                                        class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple">
-                                        <span class="font-medium">FAVORITES</span>
-                                        <i class="pi pi-chevron-down"></i>
-                                    </div> -->
-                                    <ul class="list-none p-0 m-0 overflow-hidden">
+                                    <a v-ripple href="/home"
+                                       :class="[{ 'active': isActive('/home') }, 'nav-link']">
+                                        <i class="pi pi-home"></i>
+                                        <span v-if="open" class="nav-label">Dashboard</span>
+                                    </a>
+                                </li>
+
+                                <!-- Dicomstore -->
+                                <li>
+                                    <a v-ripple v-styleclass="{
+                                            selector: '@next',
+                                            enterClass: 'hidden',
+                                            enterActiveClass: 'slidedown',
+                                            leaveToClass: 'hidden',
+                                            leaveActiveClass: 'slideup'
+                                        }"
+                                        :class="[{ 'active': isActive('/log') }, 'nav-link nav-link--parent']">
+                                        <i class="pi pi-heart-fill"></i>
+                                        <span v-if="open" class="nav-label">Dicomstore</span>
+                                        <i v-if="open" class="pi pi-chevron-down nav-chevron"></i>
+                                    </a>
+
+                                    <ul class="tree-branch hidden">
                                         <li>
-                                            <a v-ripple href="/home"
-                                               :class="[{ 'active': isActive('/home') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                <i class="pi pi-home mr-2"></i>
-                                                <span v-if="open" class="font-medium">Dashboard</span>
+                                            <a v-ripple href="/log/upload"
+                                               :class="[{ 'active': isActive('/log/upload') }, 'nav-link']">
+                                                <i class="pi pi-upload"></i>
+                                                <span v-if="open" class="nav-label">Log Upload Dicom</span>
                                             </a>
                                         </li>
-                                       
+                                        <li>
+                                            <a v-ripple href="/log/monitoring"
+                                               :class="[{ 'active': isActive('/log/monitoring') }, 'nav-link']">
+                                                <i class="pi pi-desktop"></i>
+                                                <span v-if="open" class="nav-label">Monitoring Router</span>
+                                            </a>
+                                        </li>
+
+                                        <!-- Master Data -->
                                         <li>
                                             <a v-ripple v-styleclass="{
-                                                selector: '@next',
-                                                enterClass: 'hidden',
-                                                enterActiveClass: 'slidedown',
-                                                leaveToClass: 'hidden',
-                                                leaveActiveClass: 'slideup'
-                                            }"
-                                                :class="['flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple', { 'active': isActive('/log') }]">
-                                                <i class="pi pi-heart-fill mr-2"></i>
-                                                <span v-if="open" class="font-medium">Dicomstore</span>
-                                                <i class="pi pi-chevron-down ml-auto"></i>
-                                            </a>
-                                            <ul
-                                                class="list-none py-0 pl-3 pr-0 m-0 overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                                                <li>
-                                                <a v-ripple
-                                                    href="/log/upload"
-                                                    :class="[{ 'active': isActive('/log/upload') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                    <i class="pi pi-users mr-2"></i>
-                                                    <span v-if="open" class="font-medium">Log Upload Dicom</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a v-ripple
-                                                    href="/log/monitoring"
-                                                    :class="[{ 'active': isActive('/log/monitoring') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                    <i class="pi pi-desktop mr-2"></i>
-                                                    <span v-if="open" class="font-medium">Monitoring Router</span>
-                                                </a>
-                                            </li>
-
-                                            <li>
-                                                <a v-ripple v-styleclass="{
                                                     selector: '@next',
                                                     enterClass: 'hidden',
                                                     enterActiveClass: 'slidedown',
                                                     leaveToClass: 'hidden',
                                                     leaveActiveClass: 'slideup'
                                                 }"
-                                                    :class="['flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple', { 'active': isActive('/auth') }]">
-                                                    <i class="pi pi-database mr-2"></i>
-                                                    <span v-if="open" class="font-medium">Master Data</span>
-                                                    <i class="pi pi-chevron-down ml-auto"></i>
-                                                </a>
-                                                <ul
-                                                    class="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                                                :class="[{ 'active': isActive('/auth') }, 'nav-link nav-link--parent']">
+                                                <i class="pi pi-database"></i>
+                                                <span v-if="open" class="nav-label">Master Data</span>
+                                                <i v-if="open" class="pi pi-chevron-down nav-chevron"></i>
+                                            </a>
 
-                                                    <li>
-                                                        <a v-ripple href="/auth/users"
-                                                            :class="[{ 'active': isActive('/auth/users') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                            <i class="pi pi-user-edit mr-2"></i>
-                                                            <span v-if="open" class="font-medium">Pengguna</span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a v-ripple href="/satusehat/config"
-                                                            :class="[{ 'active': isActive('/satusehat/config') }, 'flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple']">
-                                                            <i class="pi pi-cog mr-2"></i>
-                                                            <span v-if="open" class="font-medium">SATUSEHAT Config</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                           
-                                           
+                                            <ul class="tree-branch hidden">
+                                                <li>
+                                                    <a v-ripple href="/auth/users"
+                                                       :class="[{ 'active': isActive('/auth/users') }, 'nav-link']">
+                                                        <i class="pi pi-user-edit"></i>
+                                                        <span v-if="open" class="nav-label">Pengguna</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a v-ripple href="/satusehat/config"
+                                                       :class="[{ 'active': isActive('/satusehat/config') }, 'nav-link']">
+                                                        <i class="pi pi-cog"></i>
+                                                        <span v-if="open" class="nav-label">SATUSEHAT Config</span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
-                                    
-                                      
                                     </ul>
                                 </li>
+
                             </ul>
                         </div>
             </div>
@@ -168,201 +154,230 @@ function isActive(path) {
 </script>
 
 <style>
-/* Styling tambahan untuk menu sidebar */
-/* Sidebar Styling */
-/* Sidebar */
-
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .custom-sidebar {
     position: fixed;
-    top: 90px;
-    left: 10px;
-    border-radius: 2%;
-    height: calc(100vh - 100px); /* agar tidak melebihi viewport, 100px = top + margin bawah jika ada */
-    width: 15%;
-    background-color: rgba(255, 255, 255, 0);
+    top: 60px; /* flush under topbar */
+    left: 0;
+    height: calc(100vh - 60px);
+    width: 220px;
+    background: var(--surface-card, #ffffff);
+    border-right: 1px solid var(--surface-border, #e5e7eb);
     z-index: 999;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
+    transition: width 0.25s ease;
 }
 
-.content-with-sidebar {
-    margin-left: 15%;
-    /* Sama dengan lebar sidebar */
-    width: 85%;
-    transition: margin-left 0.9s ease;
-}
-
+/* Sidebar open */
 .custom-sidebar.sidebar-open {
-    left: 10px;
-    /* Posisi terbuka */
+    width: 220px;
 }
 
-.main-content {
-    padding: 2px;
+/* Sidebar collapsed */
+.custom-sidebar.sidebar-close {
+    width: 64px;
 }
 
-/* Animasi slide Konten utama */
-.content-full {
-    width: 100%;
-    transition: margin-left 0.9s ease;
+/* ── Nav root ────────────────────────────────────────────────────────────── */
+.nav-root {
+    list-style: none;
+    padding: 0.75rem 0.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
+/* Section label */
+.nav-section-label {
+    padding: 0.5rem 0.75rem 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-color-secondary, #9ca3af);
+    user-select: none;
+}
 
-/* Pastikan area menu juga scrollable jika menu sangat panjang */
+/* ── Nav link ────────────────────────────────────────────────────────────── */
+.nav-link {
+    text-decoration: none;
+    color: var(--text-color, #374151);
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.nav-link i {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+}
+
+.nav-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+
+.nav-chevron {
+    font-size: 0.7rem !important;
+    width: auto !important;
+    color: var(--text-color-secondary, #9ca3af);
+    transition: transform 0.2s;
+}
+
+.nav-link:hover {
+    background: #f0fdf4;
+    color: #047857;
+}
+
+.nav-link.active {
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 #10b981;
+}
+
+.nav-link.active i { color: #10b981; }
+
+/* ── Tree branch (submenu with lines) ───────────────────────────────────── */
+.tree-branch {
+    list-style: none;
+    margin: 2px 0 2px 1.4rem;   /* indent from parent icon center */
+    padding: 0;
+    position: relative;
+    border-left: 2px solid #a7f3d0; /* vertical line — emerald-200 */
+    overflow: hidden;               /* keeps hidden/slidedown working */
+}
+
+/* Horizontal connector from vertical line → link */
+.tree-branch > li {
+    position: relative;
+    margin: 2px 0;
+}
+
+.tree-branch > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.15rem;          /* align with link center (padding 0.55rem + icon ~0.5rem /2) */
+    width: 0.6rem;
+    height: 2px;
+    background: #a7f3d0;   /* same emerald-200 */
+}
+
+/* Last item: cover vertical line below connector */
+.tree-branch > li:last-child::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 1.15rem;
+    bottom: 0;
+    width: 2px;
+    background: var(--surface-card, #ffffff);
+}
+
+/* Nested tree-branch (level 2) — slightly deeper color */
+.tree-branch .tree-branch {
+    margin-left: 1.2rem;
+    border-left-color: #6ee7b7; /* emerald-300 */
+}
+
+.tree-branch .tree-branch > li::before {
+    background: #6ee7b7;
+}
+
+/* Scrollable area */
 .custom-sidebar .overflow-y-auto {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-}
-
-/* Styling Hamburger Button */
-.hamburger-button {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    z-index: 1001;
-    padding: 0.5rem !important;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    background-color: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-}
-
-.hamburger-button:hover {
-    background-color: var(--primary-50);
-    color: var(--primary-color);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.hamburger-button i {
-    font-size: 1.25rem;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* jarak antar icon item */
-li {
-    margin: 5px 0;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-/* Collapsed state: show icon-only and narrower sidebar */
-.custom-sidebar.sidebar-close {
-    width: 100px; /* only icons */
-    overflow: visible;
-}
-
-.custom-sidebar.sidebar-close {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    padding-top: 0.75rem;
-    left: 10px;
-}
-
-.custom-sidebar.sidebar-close img {
-    width: 40px;
-    height: 40px;
-}
-
-.header-area .sidebar-logo {
-    transition: width 0.15s ease, height 0.15s ease, margin 0.15s ease;
-}
-
-.custom-sidebar.sidebar-close .header-area .sidebar-logo {
-    width: 36px !important;
-    height: 36px !important;
-    margin-right: 0 !important;
-}
-
-.custom-sidebar.sidebar-close .overflow-y-auto {
     padding-top: 0.5rem;
 }
 
-.header-area .header-collapsed {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-.custom-sidebar.sidebar-close .header-area .header-collapsed {
-    justify-content: center;
-}
-
-.custom-sidebar.sidebar-close .font-medium {
-    display: none; /* hide labels */
-}
-
-/* Adjust content when sidebar collapsed */
+/* ── Content area ────────────────────────────────────────────────────────── */
 .content-with-sidebar {
-    transition: margin-left 1.25s ease;
+    margin-left: 220px;
+    margin-top: 60px;
+    width: calc(100% - 220px);
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
 .content-with-sidebar.collapsed {
-    /* push content by collapsed sidebar width + left offset (10px) */
-    margin-left: calc(100px + 10px);
-    width: calc(100% - 110px);
+    margin-left: 64px;
+    width: calc(100% - 64px);
 }
 
-/* Active menu item */
-.custom-sidebar a.active {
-    /* Use theme-aware highlight for background while keeping primary as accent */
-    background-color: var(--highlight-bg, var(--primary-50));
-    color: var(--primary-color);
-    /* box-shadow: inset 3px 0 0 var(--primary-color); */
+.main-content {
+    padding: 1rem;
 }
 
-.custom-sidebar a.active, .custom-sidebar a.active i {
-    color: var(--primary-color);
+/* ── Hamburger button ────────────────────────────────────────────────────── */
+.hamburger-button {
+    position: fixed;
+    top: 13px;
+    left: 14px;
+    z-index: 1001;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-color-secondary, #6b7280) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
 }
 
-/* Make icon margin smaller when collapsed */
-.custom-sidebar.sidebar-close .mr-2 {
-    margin-right: 0;
+.hamburger-button:hover {
+    background: #f0fdf4 !important;
+    color: #10b981 !important;
 }
 
-/* When collapsed: center icons, keep anchors full-width and clickable */
-.custom-sidebar.sidebar-close ul li a {
-    justify-content: center !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+.hamburger-button i {
+    font-size: 1.1rem;
 }
 
-/* lebar si icon menu nya */
-.custom-sidebar.sidebar-close ul li a {
-    display: flex !important;
-    width: 100% !important;
+/* ── Collapsed state overrides ───────────────────────────────────────────── */
+.custom-sidebar.sidebar-close .nav-link {
+    justify-content: center;
+    padding: 0.6rem;
+    gap: 0;
 }
 
-.custom-sidebar.sidebar-close ul li a .font-medium {
-    display: none !important; /* hide labels */
-}
-
-/* hide submenu chevrons and trailing icons when collapsed */
-.custom-sidebar.sidebar-close .pi-chevron-down,
-.custom-sidebar.sidebar-close .ml-auto {
+.custom-sidebar.sidebar-close .nav-label,
+.custom-sidebar.sidebar-close .nav-chevron,
+.custom-sidebar.sidebar-close .nav-section-label {
     display: none !important;
 }
 
-/* ensure icon size and center inside anchor */
-.custom-sidebar.sidebar-close ul li a i {
-    font-size: 1.15rem;
-    display: block;
+.custom-sidebar.sidebar-close .nav-link i {
+    font-size: 1.05rem;
+    width: auto;
+}
+
+/* Hide tree branches when collapsed — only icons visible */
+.custom-sidebar.sidebar-close .tree-branch {
+    display: none !important;
+}
+
+/* header area */
+.header-area {
+    min-height: 0;
+}
+
+/* submenus */
+.custom-sidebar ul ul {
+    padding-left: 0.5rem;
 }
 </style>

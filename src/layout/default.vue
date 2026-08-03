@@ -38,20 +38,8 @@ function handleSidebarToggle(status) {
 </template>
 
 <style scoped>
-.content-full {
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-}
-
-.content-with-sidebar {
-    margin-left: 15%;
-    transition: margin-left 0.3s ease;
-}
-
-.content {
-    max-width: 1910px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+#app {
+    min-height: 100vh;
+    background: var(--surface-ground, #f9fafb);
 }
 </style>

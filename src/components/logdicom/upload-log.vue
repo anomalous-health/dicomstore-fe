@@ -1,172 +1,87 @@
 <template>
-  <div class="monitor-page">
-    <div class="card">
-      <Toast />
+  <div class="upload-page">
+    <Toast />
 
-      <!-- Button -->
-
-      <div class="grid">
-        <div class="col-4">
-          <Toolbar class="mb-2">
-            <template #start>
-              <FileUpload
-                ref="fileUpload"
-                mode="advanced"
-                :multiple="true"
-                accept=".dcm,application/dicom,application/octet-stream"
-                :maxFileSize="5000000000"
-                customUpload
-                @uploader="uploadDicom"
-              >
-                <template
-                  #header="{
-                    chooseCallback,
-                    uploadCallback,
-                    clearCallback,
-                    files,
-                  }"
-                >
-                  <div class="flex justify-between items-center w-full">
-                    <div class="flex gap-2">
-                      <Button
-                        label="Import"
-                        icon="pi pi-file"
-                        @click="chooseCallback()"
-                      />
-
-                      <Button
-                        label="Import Folder"
-                        icon="pi pi-folder-open"
-                        severity="secondary"
-                        @click="triggerFolderInput"
-                      />
-
-                      <Button
-                        label="Upload"
-                        icon="pi pi-upload"
-                        severity="success"
-                        :disabled="!files || files.length === 0"
-                        @click="uploadCallback()"
-                      />
-
-                      <Button
-                        label="Clear"
-                        icon="pi pi-times"
-                        severity="danger"
-                        :disabled="!files || files.length === 0"
-                        @click="clearCallback()"
-                      />
-                    </div>
-                  </div>
-                </template>
-
-                <template #empty>
-                  <div class="flex flex-col items-center py-7 pl-8 ml-6">
-                    <i class="pi pi-cloud-upload text-4xl mb-2"></i>
-                    <span>Drag & Drop DICOM disini</span>
-                  </div>
-                </template>
-              </FileUpload>
-
-              <input
-                ref="folderInput"
-                type="file"
-                webkitdirectory
-                directory
-                multiple
-                hidden
-                @change="onFolderSelected"
-              />
-
-              <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
-            </template>
-          </Toolbar>
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <div class="up-header">
+      <div class="up-header__left">
+        <p class="up-header__sub">DICOM</p>
+        <h1 class="up-header__title">Log Upload</h1>
+      </div>
+      <div class="up-scp" :class="scpStatus.running ? 'up-scp--up' : 'up-scp--down'">
+        <span class="up-scp__dot" />
+        <div class="up-scp__body">
+          <span class="up-scp__label">SCP Listener</span>
+          <span class="up-scp__status">{{ scpStatus.running ? 'RUNNING' : 'STOPPED' }}</span>
+          <span v-if="scpStatus.running" class="up-scp__meta">
+            AE: <b>{{ scpStatus.aeTitle || '-' }}</b> · Port: <b>{{ scpStatus.port || '-' }}</b>
+          </span>
         </div>
-        <div class="col-6">
-          <Toolbar class="mb-2">
-            <template #start>
-              <div class="">
-                <MiniMonitoringView />
-              </div>
-
-              <!-- <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" /> -->
-            </template>
-          </Toolbar>
-        </div>
-        <div class="col-2">
-          <Toolbar class="mb-2">
-            <template #start>
-              <div class="grid">
-                <div
-                  class="surface-card shadow-2 p-3 border-round mb-3"
-                  style="border-left: 6px solid var(--blue-500)"
-                >
-                  <div class="flex justify-content-between mb-3">
-                    <div>
-                      <span class="block text-500 font-medium mb-2"
-                        >Status SCP Listener</span
-                      >
-                      <div class="text-900 font-medium text-xl">
-                        <Tag
-                          v-if="scpStatus.running"
-                          severity="success"
-                          value="RUNNING"
-                        ></Tag>
-                        <Tag v-else severity="danger" value="STOPPED"></Tag>
-                      </div>
-                    </div>
-                    <div
-                      class="flex align-items-center justify-content-center bg-blue-100 border-round"
-                      style="width: 2.5rem; height: 2.5rem"
-                    >
-                      <i class="pi pi-desktop text-blue-500 text-xl"></i>
-                    </div>
-                  </div>
-                  <!-- <span class="text-green-500 font-medium"
-                    >{{ scpStatus.activeConnections }}
-                  </span> -->
-                  <span class="text-500">koneksi aktif</span>
-                  <!-- <div class="mt-2 text-sm text-600">
-                    AE Title: <strong>{{ scpStatus.aeTitle || "-" }}</strong> |
-                    Port: <strong>{{ scpStatus.port || "-" }}</strong>
-                  </div> -->
-                </div>
-              </div>
-            </template>
-          </Toolbar>
+        <div v-if="scpStatus.running" class="up-scp__conn">
+          <span class="up-scp__conn-count">{{ scpStatus.activeConnections }}</span>
+          <span class="up-scp__conn-label">koneksi</span>
         </div>
       </div>
-      <!-- <Toolbar class="mb-2">
+    </div>
 
-                <template #start>
-                    <FileUpload ref="fileUpload" mode="advanced" :multiple="true"
-                        accept=".dcm,application/dicom,application/octet-stream" :maxFileSize="5000000000"
-                        label="Import" chooseLabel="Import" class="mr-2 inline-block" customUpload
-                        @uploader="uploadDicom">
+    <!-- ── Top panels: Upload + Monitor ───────────────────────────────── -->
+    <div class="up-panels">
 
-                        <template #empty>
-                            <div class="flex items-center justify-center flex-col py-4" style="text-align: center;">
-                                <i class="pi pi-cloud-upload text-gray-400"
-                                    style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
-                                <p class="m-0 text-gray-500 font-semibold">Upload Disini</p><br>
-                                <span class="text-xs text-gray-400">(klik tombol Import untuk memilih file, bisa pilih
-                                    banyak file sekaligus)</span>
-                            </div>
+      <!-- Upload panel -->
+      <div class="up-panel">
+        <div class="up-panel__header">
+          <div class="up-panel__icon"><i class="pi pi-cloud-upload" /></div>
+          <span class="up-panel__title">Upload DICOM</span>
+          <span class="up-panel__hint">Maks. 5 GB per file · .dcm</span>
+        </div>
+        <div class="up-panel__body">
+          <FileUpload
+            ref="fileUpload"
+            mode="advanced"
+            :multiple="true"
+            accept=".dcm,application/dicom,application/octet-stream"
+            :maxFileSize="5000000000"
+            customUpload
+            @uploader="uploadDicom"
+          >
+            <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
+              <div class="fu-actions">
+                <Button label="Import File" icon="pi pi-file" size="small" @click="chooseCallback()" />
+                <Button label="Import Folder" icon="pi pi-folder-open" severity="secondary" size="small" @click="triggerFolderInput" />
+                <Button label="Upload" icon="pi pi-upload" severity="success" size="small"
+                  :disabled="!files || files.length === 0" @click="uploadCallback()" />
+                <Button label="Clear" icon="pi pi-times" severity="danger" size="small"
+                  :disabled="!files || files.length === 0" @click="clearCallback()" />
+              </div>
+            </template>
+            <template #empty>
+              <div class="fu-empty">
+                <i class="pi pi-cloud-upload fu-empty__icon" />
+                <p class="fu-empty__text">Drag &amp; Drop file DICOM ke sini</p>
+                <span class="fu-empty__hint">atau gunakan tombol Import di atas</span>
+              </div>
+            </template>
+          </FileUpload>
 
-                        </template>
-                        
+          <input ref="folderInput" type="file" webkitdirectory directory multiple hidden @change="onFolderSelected" />
+        </div>
+      </div>
 
-                    </FileUpload>
+      <!-- Monitor panel -->
+      <div class="up-panel">
+        <div class="up-panel__header">
+          <div class="up-panel__icon up-panel__icon--blue"><i class="pi pi-desktop" /></div>
+          <span class="up-panel__title">Monitor Service</span>
+        </div>
+        <div class="up-panel__body">
+          <MiniMonitoringView />
+        </div>
+      </div>
 
-                    <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
-                </template>
-                <template #end>
-                    <div class="w-full flex-1" style="max-width: 100%; min-width: 300px;">
-                        <MiniMonitoringView />
-                    </div>
-                </template>
-            </Toolbar> -->
+    </div>
 
+    <!-- ── DataTable ───────────────────────────────────────────────────── -->
+    <div class="up-table-panel">
       <DataTable
         ref="dt"
         :value="data"
@@ -367,7 +282,7 @@
           </template>
         </Column>
       </DataTable>
-    </div>
+    </div><!-- /up-table-panel -->
 
     <!-- Create Dialog -->
     <Dialog
@@ -763,17 +678,211 @@
         />
       </template>
     </Dialog>
-  </div>
+  </div><!-- /upload-page -->
 </template>
 
-<style>
-@import "../style.css";
-
-.monitor-page {
+<style scoped>
+/* ── Page wrapper ────────────────────────────────────────────────────────── */
+.upload-page {
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.up-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem;
+}
+
+.up-header__sub {
+  margin: 0 0 0.1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #10b981;
+}
+
+.up-header__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color, #111827);
+  letter-spacing: -0.02em;
+}
+
+/* SCP badge */
+.up-scp {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid;
+  min-width: 220px;
+}
+
+.up-scp--up  { background: #f0fdf4; border-color: #a7f3d0; }
+.up-scp--down { background: #fef2f2; border-color: #fecaca; }
+
+.up-scp__dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.up-scp--up  .up-scp__dot { background: #10b981; animation: scp-pulse 2s ease-in-out infinite; }
+.up-scp--down .up-scp__dot { background: #ef4444; }
+
+@keyframes scp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+  50%       { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+}
+
+.up-scp__body { display: flex; flex-direction: column; gap: 0.05rem; }
+.up-scp__label  { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; }
+.up-scp__status { font-size: 0.875rem; font-weight: 700; }
+.up-scp--up  .up-scp__status { color: #047857; }
+.up-scp--down .up-scp__status { color: #b91c1c; }
+.up-scp__meta   { font-size: 0.72rem; color: #6b7280; }
+
+.up-scp__conn {
+  margin-left: auto;
+  display: flex; flex-direction: column; align-items: center;
+  padding-left: 0.85rem;
+  border-left: 1px solid #a7f3d0;
+}
+.up-scp__conn-count { font-size: 1.4rem; font-weight: 700; color: #047857; line-height: 1; }
+.up-scp__conn-label { font-size: 0.68rem; color: #6b7280; }
+
+/* ── Top panels ──────────────────────────────────────────────────────────── */
+.up-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) { .up-panels { grid-template-columns: 1fr; } }
+
+.up-panel {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--surface-border, #e5e7eb);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.up-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--surface-border, #f3f4f6);
+}
+
+.up-panel__icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #059669;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  i { font-size: 0.9rem; }
+}
+
+.up-panel__icon--blue { background: #eff6ff; color: #3b82f6; }
+
+.up-panel__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-color, #111827);
+}
+
+.up-panel__hint {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+.up-panel__body { padding: 1rem; }
+
+/* FileUpload action row */
+.fu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+/* FileUpload empty zone */
+.fu-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  gap: 0.35rem;
+}
+
+.fu-empty__icon {
+  font-size: 2.5rem;
+  color: #a7f3d0;
+  margin-bottom: 0.25rem;
+}
+
+.fu-empty__text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color, #374151);
+}
+
+.fu-empty__hint {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* ── DataTable panel ─────────────────────────────────────────────────────── */
+.up-table-panel {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--surface-border, #e5e7eb);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Override PrimeVue DataTable inside our panel */
+.up-table-panel :deep(.p-datatable-header) {
+  background: transparent;
+  border: none;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+.up-table-panel :deep(.p-datatable-thead > tr > th) {
+  background: var(--surface-ground, #f9fafb);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary, #6b7280);
+  padding: 0.65rem 1rem;
+}
+
+.up-table-panel :deep(.p-datatable-tbody > tr > td) {
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+}
+
+.up-table-panel :deep(.p-datatable-tbody > tr:hover) {
+  background: #f0fdf4 !important;
+}
+
+.up-table-panel :deep(.p-paginator) {
+  border-top: 1px solid var(--surface-border, #e5e7eb);
+  background: transparent;
+  padding: 0.65rem 1rem;
 }
 </style>
 

@@ -1,49 +1,31 @@
 <template>
-    <div class="card container">
-        <Menubar :model="items" class="custom-menubar">
+    <nav class="topbar">
+        <!-- Brand -->
+        <div class="topbar-brand">
+            <img src="../../assets/dicom.png" class="topbar-logo" alt="Logo" />
+            <span class="topbar-title">MedicVerse DICOM</span>
+        </div>
 
-            <template #start>
-                <div class="flex align-items-center justify-content-between pt-3 flex-shrink-0">
-                    <span class="inline-flex align-items-center gap-2" style="margin-bottom: 10px;">
-                        <img src="../../assets/dicom.png" width="40" height="40" alt="Logo" />
-                    </span>
-                </div>
-            </template>
-            <template #end>
-                <div class="flex align-items-center gap-2">
-                    <!-- <div style="display:flex; align-items:center; gap:0.5rem">
-                        <label>Pilih Tema:</label>
-                        <select v-model="selectedTheme" @change="onThemeChange">
-                            <option v-for="t in themes" :key="t" :value="t">{{ t }}</option>
-                        </select>
-                        <div class="card flex justify-content-center">
-                            <Dropdown v-model="selectedTheme" :options="themes" optionLabel="name" placeholder="Pilih Tema" class="w-full md:w-14rem" />
-                        </div>
-                        
-                    </div> -->
+        <!-- Actions -->
+        <div class="topbar-actions">
+            <!-- Dark mode -->
+            <button class="topbar-icon-btn" @click="toggleDarkMode" :title="checked ? 'Light Mode' : 'Dark Mode'">
+                <i :class="checked ? 'pi pi-moon' : 'pi pi-sun'" />
+            </button>
 
-                    <div class="toggle-container" @click="toggleDarkMode">
-                        <label> Mode </label>
-                        <Button class="toggle-button">
-                            <i :class="checked ? 'pi pi-moon' : 'pi pi-sun'"
-                                :style="{ color: checked ? 'yellow' : 'blue' }"></i>
-                        </Button>
-                    </div>
-                    <label class="blinking">{{ "| " + userRole + " |" }}</label>
+            <!-- Divider -->
+            <div class="topbar-divider" />
 
-                    <!--                    <InputText placeholder="Search" type="text" class="w-8rem sm:w-auto" />-->
-                    <div style="display: flex; align-items: center">
+            <!-- Role badge -->
+            <div class="topbar-role" v-if="userRole">
+                <i class="pi pi-user" />
+                <span>{{ userRole }}</span>
+            </div>
 
-                        <!-- <Button icon="pi pi-file-pdf" severity="success" class="mr-2 bs" /> -->
-
-                        <SplitButton class="bs" label="" icon="pi pi-cog" :model="menuSetting" severity="">
-                        </SplitButton>
-                    </div>
-                </div>
-            </template>
-        </Menubar>
-
-    </div>
+            <!-- Settings -->
+            <SplitButton class="topbar-settings" label="" icon="pi pi-cog" :model="menuSetting" />
+        </div>
+    </nav>
 </template>
 
 <script setup>
@@ -273,117 +255,111 @@ const menuSetting = [
 </script>
 
 <style scoped>
-/* Geser keseluruhan Menubar ke kanan */
-.custom-menubar {
-    padding-left: 4rem;
-    height: 60px;
-    justify-content: center;
-    /* Geser seluruh menu ke kanan */
-}
-
-/* Atur padding untuk item spesifik (Home, Features, Projects) */
-.p-menubar .p-menuitem:first-child .p-menuitem-text {
-    padding-left: 1rem;
-    /* Home */
-}
-
-.p-menubar .p-menuitem:nth-child(2) .p-menuitem-text {
-    padding-left: 1.5rem;
-    /* Features */
-}
-
-.p-menubar .p-menuitem:nth-child(3) .p-menuitem-text {
-    padding-left: 1.5rem;
-    /* Projects */
-}
-
-/* Pastikan dropdown tetap terposisi dengan baik */
-.dropdown-container {
-    position: relative;
-}
-
-.custom-split-button {
-    padding: 0px;
-    border-radius: 50%;
-    margin: 10px;
-    background-color: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-.button-image {
-    width: 30px;
-    height: auto;
-    border-radius: 50%;
-}
-
-.dropdown-container {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    width: 150px;
-    left: -80px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+/* ── Topbar ──────────────────────────────────────────────────────────────── */
+.topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
     z-index: 1000;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem 0 4.5rem; /* left offset clears hamburger */
+    background: var(--surface-card, #ffffff);
+    border-bottom: 1px solid var(--surface-border, #e5e7eb);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 }
 
-.dropdown-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+/* Brand */
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
 }
 
-.dropdown-menu li {
-    padding: 8px 16px;
+.topbar-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.topbar-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-color, #111827);
+    letter-spacing: -0.01em;
+}
+
+/* Actions */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--surface-border, #e5e7eb);
+    margin: 0 0.25rem;
+}
+
+/* Dark mode icon button */
+.topbar-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border, #e5e7eb);
+    background: transparent;
     cursor: pointer;
-    color: black;
-    font-weight: bold;
-}
-
-.dropdown-menu li:hover {
-    background-color: #f0f0f0;
-}
-
-.toggle-container {
     display: flex;
     align-items: center;
     justify-content: center;
-}
+    color: var(--text-color-secondary, #6b7280);
+    transition: background 0.15s, color 0.15s;
 
-.toggle-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-}
-</style>
-
-<style>
-.blinking {
-    animation: blink-animation 1.5s linear infinite;
-    color: rgb(197, 230, 50);
-    /* Bisa disesuaikan */
-    font-weight: bold;
-}
-
-@keyframes blink-animation {
-
-    0%,
-    100% {
-        opacity: 1;
+    &:hover {
+        background: var(--surface-hover, #f3f4f6);
+        color: #10b981;
     }
 
-    50% {
-        opacity: 0;
+    i { font-size: 0.95rem; }
+}
+
+/* Role badge */
+.topbar-role {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #047857;
+    text-transform: capitalize;
+
+    i { font-size: 0.75rem; }
+}
+
+/* Settings splitbutton — strip default PrimeVue styles */
+.topbar-settings :deep(.p-splitbutton-defaultbutton) {
+    display: none; /* hide the label button, show only dropdown arrow */
+}
+
+.topbar-settings :deep(.p-splitbutton-menubutton) {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border, #e5e7eb);
+    background: transparent;
+    color: var(--text-color-secondary, #6b7280);
+
+    &:hover {
+        background: var(--surface-hover, #f3f4f6);
+        color: #10b981;
     }
 }
 </style>

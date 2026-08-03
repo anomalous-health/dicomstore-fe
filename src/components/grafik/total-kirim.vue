@@ -2,93 +2,105 @@
     <div class="total-kirim-wrapper">
         <Toast />
 
-        <!-- Summary Cards -->
-        <div class="grid mb-3">
-            <div class="col-12 md:col-4">
-                <div class="summary-card summary-card--success">
-                    <div class="summary-card__icon">
-                        <i class="pi pi-check-circle"></i>
-                    </div>
-                    <div class="summary-card__content">
-                        <span class="summary-card__label">Sukses Terkirim</span>
-                        <span class="summary-card__value">{{ summaryData.success }}</span>
-                    </div>
+        <!-- ── Row 1: Status pengiriman (3 cards) ───────────────────────── -->
+        <div class="metric-row mb-4">
+            <div class="metric-card metric-card--success">
+                <div class="metric-card__bg-icon"><i class="pi pi-check-circle" /></div>
+                <div class="metric-card__icon-wrap">
+                    <i class="pi pi-check-circle" />
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">Sukses Terkirim</span>
+                    <span class="metric-card__value">{{ summaryData.success }}</span>
+                </div>
+                <div class="metric-card__trend">
+                    <i class="pi pi-arrow-up-right" /> kirim
                 </div>
             </div>
-            <div class="col-12 md:col-4">
-                <div class="summary-card summary-card--failed">
-                    <div class="summary-card__icon">
-                        <i class="pi pi-times-circle"></i>
-                    </div>
-                    <div class="summary-card__content">
-                        <span class="summary-card__label">Gagal Terkirim</span>
-                        <span class="summary-card__value">{{ summaryData.failed }}</span>
-                    </div>
+
+            <div class="metric-card metric-card--failed">
+                <div class="metric-card__bg-icon"><i class="pi pi-times-circle" /></div>
+                <div class="metric-card__icon-wrap">
+                    <i class="pi pi-times-circle" />
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">Gagal Terkirim</span>
+                    <span class="metric-card__value">{{ summaryData.failed }}</span>
+                </div>
+                <div class="metric-card__trend metric-card__trend--warn">
+                    <i class="pi pi-exclamation-triangle" /> error
                 </div>
             </div>
-            <div class="col-12 md:col-4">
-                <div class="summary-card summary-card--pending">
-                    <div class="summary-card__icon">
-                        <i class="pi pi-clock"></i>
-                    </div>
-                    <div class="summary-card__content">
-                        <span class="summary-card__label">Belum Dikirim</span>
-                        <span class="summary-card__value">{{ summaryData.pending }}</span>
-                    </div>
+
+            <div class="metric-card metric-card--pending">
+                <div class="metric-card__bg-icon"><i class="pi pi-clock" /></div>
+                <div class="metric-card__icon-wrap">
+                    <i class="pi pi-clock" />
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">Belum Dikirim</span>
+                    <span class="metric-card__value">{{ summaryData.pending }}</span>
+                </div>
+                <div class="metric-card__trend metric-card__trend--neutral">
+                    <i class="pi pi-hourglass" /> antrian
                 </div>
             </div>
         </div>
 
-        <div class="grid mb-3">
-            <div class="col-12 md:col-6">
-                <div class="summary-card summary-card--web">
-                    <div class="summary-card__icon">
-                        <i class="pi pi-cloud-upload"></i>
-                    </div>
-                    <div class="summary-card__content">
-                        <span class="summary-card__label">Upload via Web</span>
-                        <span class="summary-card__value">{{ summaryData.web }}</span>
-                    </div>
+        <!-- ── Row 2: Sumber data (2 cards) ────────────────────────────── -->
+        <div class="metric-row metric-row--2col mb-4">
+            <div class="metric-card metric-card--web">
+                <div class="metric-card__bg-icon"><i class="pi pi-cloud-upload" /></div>
+                <div class="metric-card__icon-wrap">
+                    <i class="pi pi-cloud-upload" />
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">Upload via Web</span>
+                    <span class="metric-card__value">{{ summaryData.web }}</span>
+                </div>
+                <div class="metric-card__trend metric-card__trend--neutral">
+                    <i class="pi pi-globe" /> web
                 </div>
             </div>
-            <div class="col-12 md:col-6">
-                <div class="summary-card summary-card--scp">
-                    <div class="summary-card__icon">
-                        <i class="pi pi-desktop"></i>
-                    </div>
-                    <div class="summary-card__content">
-                        <span class="summary-card__label">Terima dari Modality (SCP)</span>
-                        <span class="summary-card__value">{{ summaryData.scp }}</span>
-                    </div>
+
+            <div class="metric-card metric-card--scp">
+                <div class="metric-card__bg-icon"><i class="pi pi-desktop" /></div>
+                <div class="metric-card__icon-wrap">
+                    <i class="pi pi-desktop" />
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">Terima dari Modality (SCP)</span>
+                    <span class="metric-card__value">{{ summaryData.scp }}</span>
+                </div>
+                <div class="metric-card__trend metric-card__trend--neutral">
+                    <i class="pi pi-wifi" /> modality
                 </div>
             </div>
         </div>
 
-        <!-- Chart Section -->
-        <div class="grid">
-            <div class="col-12">
-                <Panel>
-                    <template #header>
-                        <div class="chart-header">
-                            <h3 class="chart-header__title">
-                                <i class="pi pi-chart-bar mr-2"></i>
-                                Statistik Pengiriman Imagging Study Ke Satu Sehat
-                            </h3>
-                            <div class="chart-header__controls">
-                                <SelectButton v-model="selectedPeriod" :options="periodOptions"
-                                    optionLabel="label" optionValue="value" :allowEmpty="false"
-                                    @change="onPeriodChange" />
-                            </div>
-                        </div>
-                    </template>
-                    <div class="chart-container">
-                        <Bar v-if="chartReady" :data="chartData" :options="chartOptions" />
-                        <div v-else class="chart-loading">
-                            <ProgressSpinner style="width: 50px; height: 50px" />
-                            <p>Memuat data grafik...</p>
-                        </div>
+        <!-- ── Chart ────────────────────────────────────────────────────── -->
+        <div class="chart-panel">
+            <div class="chart-panel__header">
+                <div class="chart-panel__title-group">
+                    <div class="chart-panel__icon-wrap">
+                        <i class="pi pi-chart-bar" />
                     </div>
-                </Panel>
+                    <div>
+                        <h3 class="chart-panel__title">Statistik Pengiriman Imaging Study</h3>
+                        <p class="chart-panel__subtitle">Ke SatuSehat · Auto refresh tiap 30 detik</p>
+                    </div>
+                </div>
+                <SelectButton v-model="selectedPeriod" :options="periodOptions"
+                    optionLabel="label" optionValue="value" :allowEmpty="false"
+                    @change="onPeriodChange" class="chart-period-btn" />
+            </div>
+
+            <div class="chart-container">
+                <Bar v-if="chartReady" :data="chartData" :options="chartOptions" />
+                <div v-else class="chart-loading">
+                    <ProgressSpinner style="width: 44px; height: 44px" />
+                    <p>Memuat data grafik...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -369,108 +381,170 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Summary Cards */
-.summary-card {
+/* ── Metric rows ─────────────────────────────────────────────────────────── */
+.metric-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.metric-row--2col {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* ── Metric card ─────────────────────────────────────────────────────────── */
+.metric-card {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+    border-radius: 14px;
+    color: #fff;
+    overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: default;
 }
 
-.summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
 }
 
-.summary-card--success {
-    background: linear-gradient(135deg, #065f46, #059669);
-    color: #fff;
-}
-
-.summary-card--failed {
-    background: linear-gradient(135deg, #7f1d1d, #dc2626);
-    color: #fff;
-}
-
-.summary-card--pending {
-    background: linear-gradient(135deg, #78350f, #d97706);
-    color: #fff;
-}
-
-.summary-card--web {
-    background: linear-gradient(135deg, #374151, #4b5563);
-    color: #fff;
-}
-
-.summary-card--scp {
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-    color: #fff;
-}
-
-.summary-card__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.2);
-    flex-shrink: 0;
-}
-
-.summary-card__icon i {
-    font-size: 1.5rem;
-}
-
-.summary-card__content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.summary-card__label {
-    font-size: 0.85rem;
-    opacity: 0.9;
-    font-weight: 500;
-}
-
-.summary-card__value {
-    font-size: 1.75rem;
-    font-weight: 700;
+/* Decorative large bg icon */
+.metric-card__bg-icon {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 5rem;
+    opacity: 0.08;
+    pointer-events: none;
     line-height: 1;
 }
 
-/* Chart Header */
-.chart-header {
+/* Small icon circle */
+.metric-card__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.18);
+    flex-shrink: 0;
+    backdrop-filter: blur(4px);
+}
+
+.metric-card__icon-wrap i {
+    font-size: 1.25rem;
+}
+
+/* Body */
+.metric-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+}
+
+.metric-card__label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.metric-card__value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+/* Trend chip */
+.metric-card__trend {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    align-self: flex-start;
+
+    i { font-size: 0.65rem; }
+}
+
+.metric-card__trend--warn    { background: rgba(255, 200, 100, 0.25); }
+.metric-card__trend--neutral { background: rgba(255, 255, 255, 0.12); }
+
+/* Card color variants */
+.metric-card--success { background: linear-gradient(135deg, #065f46 0%, #059669 100%); }
+.metric-card--failed  { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); }
+.metric-card--pending { background: linear-gradient(135deg, #78350f 0%, #d97706 100%); }
+.metric-card--web     { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); }
+.metric-card--scp     { background: linear-gradient(135deg, #1a1f35 0%, #4f46e5 100%); }
+
+/* ── Chart panel ─────────────────────────────────────────────────────────── */
+.chart-panel {
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--surface-border, #e5e7eb);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.chart-panel__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    flex-wrap: wrap;
     gap: 1rem;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border, #f3f4f6);
+    flex-wrap: wrap;
 }
 
-.chart-header__title {
-    margin: 0;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-}
-
-.chart-header__controls {
+.chart-panel__title-group {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-/* Chart Container */
+.chart-panel__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ecfdf5;
+    color: #059669;
+    flex-shrink: 0;
+
+    i { font-size: 1rem; }
+}
+
+.chart-panel__title {
+    margin: 0 0 0.1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-color, #111827);
+}
+
+.chart-panel__subtitle {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-color-secondary, #9ca3af);
+}
+
 .chart-container {
     position: relative;
-    height: 400px;
-    width: 100%;
+    height: 380px;
+    padding: 1.25rem 1.5rem 1rem;
 }
 
 .chart-loading {
@@ -479,23 +553,21 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     height: 100%;
-    gap: 1rem;
+    gap: 0.75rem;
     color: var(--text-color-secondary);
+    font-size: 0.875rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .chart-container {
-        height: 300px;
-    }
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .metric-row       { grid-template-columns: repeat(2, 1fr); }
+    .metric-row--2col { grid-template-columns: 1fr; }
+    .chart-container  { height: 300px; }
+}
 
-    .chart-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .summary-card__value {
-        font-size: 1.4rem;
-    }
+@media (max-width: 600px) {
+    .metric-row { grid-template-columns: 1fr; }
+    .metric-card__value { font-size: 1.6rem; }
+    .chart-panel__header { flex-direction: column; align-items: flex-start; }
 }
 </style>
